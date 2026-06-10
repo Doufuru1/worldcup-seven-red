@@ -76,6 +76,100 @@
                 </div>
             </section>
 
+            <!-- Mining Pool Tab -->
+            <section id="mining" class="tab-page">
+                <div class="tab-header">
+                    <h2>⛏️ 矿池</h2>
+                    <p class="tab-subtitle">下注挖矿，赚取平台 Token</p>
+                </div>
+
+                <!-- Mining Stats -->
+                <div class="stats-row">
+                    <div class="stat-pill">
+                        <span class="stat-pill-value accent" id="miningTotalStake">0</span>
+                        <span class="stat-pill-label">累计下注</span>
+                    </div>
+                    <div class="stat-pill">
+                        <span class="stat-pill-value accent" id="miningTotalRewards">0</span>
+                        <span class="stat-pill-label">Token奖励</span>
+                    </div>
+                    <div class="stat-pill">
+                        <span class="stat-pill-value accent" id="miningLevel">Lv1</span>
+                        <span class="stat-pill-label">当前等级</span>
+                    </div>
+                    <div class="stat-pill">
+                        <span class="stat-pill-value accent" id="miningBoost">+0%</span>
+                        <span class="stat-pill-label">等级加成</span>
+                    </div>
+                </div>
+
+                <!-- User Level Card -->
+                <div class="level-card">
+                    <div class="level-header">
+                        <div class="level-badge" id="levelBadge">Lv1</div>
+                        <div class="level-info">
+                            <div class="level-name" id="levelName">新手矿工</div>
+                            <div class="level-progress-bar">
+                                <div class="level-progress-fill" id="levelProgress" style="width: 0%"></div>
+                            </div>
+                            <div class="level-progress-text" id="levelProgressText">0 / 100 USDT</div>
+                        </div>
+                    </div>
+                    <div class="level-benefits" id="levelBenefits">
+                        <div class="benefit-item active">
+                            <span class="benefit-icon">✅</span>
+                            <span>基础挖矿奖励</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Mining Rules -->
+                <div class="rules-banner-compact">
+                    <div class="rules-banner-toggle" id="miningRulesToggle">
+                        <span>📋 挖矿规则</span>
+                        <span class="toggle-icon">▼</span>
+                    </div>
+                    <div class="rules-banner-content" id="miningRulesContent">
+                        <div class="rule-item-compact">
+                            <span class="rule-dot"></span>
+                            <span>基础挖矿奖励 = 下注金额 × 2%</span>
+                        </div>
+                        <div class="rule-item-compact">
+                            <span class="rule-dot"></span>
+                            <span>10% 赛事结束后可领取</span>
+                        </div>
+                        <div class="rule-item-compact">
+                            <span class="rule-dot"></span>
+                            <span>90% 180天线性释放</span>
+                        </div>
+                        <div class="rule-item-compact">
+                            <span class="rule-dot"></span>
+                            <span>单笔下注 ≥ 10 USDT 才有效</span>
+                        </div>
+                        <div class="rule-item-compact">
+                            <span class="rule-dot"></span>
+                            <span>赔率 < 1.05 不享受挖矿</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Level Table -->
+                <div class="level-table-section">
+                    <h3 class="section-title">等级权益</h3>
+                    <div class="level-table" id="levelTable">
+                        <!-- Injected by JS -->
+                    </div>
+                </div>
+
+                <!-- Mining Rewards List -->
+                <div class="mining-rewards-section">
+                    <h3 class="section-title">我的挖矿奖励</h3>
+                    <div class="mining-rewards-list" id="miningRewardsList">
+                        <!-- Injected by JS -->
+                    </div>
+                </div>
+            </section>
+
             <!-- Predictions Tab -->
             <section id="predictions" class="tab-page">
                 <div class="tab-header">
@@ -227,6 +321,10 @@
             <button class="bottom-nav-item active" data-tab="home">
                 <span class="bottom-nav-icon">⚽</span>
                 <span class="bottom-nav-label">赛事</span>
+            </button>
+            <button class="bottom-nav-item" data-tab="mining">
+                <span class="bottom-nav-icon">⛏️</span>
+                <span class="bottom-nav-label">矿池</span>
             </button>
             <button class="bottom-nav-item" data-tab="predictions">
                 <span class="bottom-nav-icon">🎯</span>

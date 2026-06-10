@@ -9,6 +9,17 @@ const App = {
         matches: [],
         predictions: [],
         leaderboard: [],
+        mining: {
+            totalStake: 0,
+            totalRewards: 0,
+            level: 1,
+            levelName: '新手矿工',
+            levelProgress: 0,
+            nextLevelThreshold: 100,
+            boost: 0,
+            rewards: [],
+            claimedRewards: 0
+        },
         currentMatch: null,
         selectedOutcome: null,
         currentTab: 'home'
@@ -37,10 +48,12 @@ const App = {
         this.loadMatches();
         this.loadLeaderboard();
         this.loadPredictions();
+        this.loadMiningData();
         this.setupEventListeners();
         this.renderMatches('today');
         this.renderLeaderboard();
         this.renderPredictions();
+        this.renderMiningPage();
         this.updateWalletUI();
     },
 
@@ -182,6 +195,14 @@ const App = {
             });
         }
 
+        // Mining rules toggle
+        const miningRulesToggle = document.getElementById('miningRulesToggle');
+        if (miningRulesToggle) {
+            miningRulesToggle.addEventListener('click', () => {
+                miningRulesToggle.closest('.rules-banner-compact').classList.toggle('open');
+            });
+        }
+
         // Wallet buttons
         document.getElementById('walletBtn')?.addEventListener('click', () => this.openWalletModal());
         document.getElementById('connectWalletBtn')?.addEventListener('click', () => this.openWalletModal());
@@ -263,6 +284,7 @@ const App = {
         // Update content
         if (tab === 'home') this.renderMatches('today');
         if (tab === 'predictions') this.renderPredictions();
+        if (tab === 'mining') this.renderMiningPage();
 
         // Scroll to top
         document.querySelector('.app-content').scrollTop = 0;
@@ -734,6 +756,275 @@ const App = {
                 </div>
             `;
         }).join('');
+    },
+
+    // ===== Mining Pool Functions =====
+    loadMiningData() {
+        const saved = localStorage.getItem('worldcup_mining');
+        if (saved) {
+            this.state.mining = JSON.parse(saved);
+        }
+        this.calculateMiningFromPredictions();
+    },
+
+    saveMiningData() {
+        localStorage.setItem('worldcup_mining', JSON.stringify(this.state.mining));
+    },
+
+    calculateMiningFromPredictions() {
+        const mining = this.state.mining;
+        let totalStake = 0;
+        
+        this.state.predictions.forEach(pred => {
+            if (this.isValidMiningBet(pred)) {
+                totalStake += pred.stake;
+                
+                // Check if reward already calculated
+                const existingReward = mining.rewards.find(r => r.predictionId === pred.id);
+                if (!existingReward) {
+                    const baseReward = pred.stake * 0.02; // 2% base
+                    const boostedReward = baseReward * (1 + mining.boost / 100);
+                    
+                    mining.rewards.push({
+                        predictionId: pred.id,
+                        match: pred.match,
+                        stake: pred.stake,
+                        baseReward: baseReward.toFixed(2),
+                        boostedReward: boostedReward.toFixed(2),
+                        unlocked: (boostedReward * 0.1).toFixed(2), // 10% immediately
+                        locked: (boostedReward * 0.9).toFixed(2), // 90% locked
+                        released: 0,
+                        createdAt: new Date().toISOString(),
+                        unlockDate: new Date(Date.now() + 180 * 24 * 60 * 60 * 1000).toISOString(),
+                        claimed: false
+                    });
+                    
+                    mining.totalRewards += boostedReward;
+                }
+            }
+        });
+        
+        mining.totalStake = totalStake;
+        this.updateMiningLevel();
+        this.saveMiningData();
+    },
+
+    isValidMiningBet(prediction) {
+        // Minimum stake >= 10 USDT
+        if (prediction.stake < 10) return false;
+        
+        // Odds >= 1.05
+        if (prediction.odds < 1.05) return false;
+        
+        // Only count once per match per wallet
+        // (In real implementation, check for duplicate bets)
+        
+        return true;
+    },
+
+    updateMiningLevel() {
+        const mining = this.state.mining;
+        const totalStake = mining.totalStake;
+        
+        const levels = [
+            { level: 1, name: '新手矿工', threshold: 0, boost: 0 },
+            { level: 2, name: '初级矿工', threshold: 100, boost: 5 },
+            { level: 3, name: '中级矿工', threshold: 1000, boost: 10 },
+            { level: 4, name: '高级矿工', threshold: 5000, boost: 15 },
+            { level: 5, name: '矿场主', threshold: 20000, boost: 20 }
+        ];
+        
+        let currentLevel = levels[0];
+        let nextLevel = levels[1];
+        
+        for (let i = 0; i < levels.length; i++) {
+            if (totalStake >= levels[i].threshold) {
+                currentLevel = levels[i];
+                nextLevel = levels[i + 1] || null;
+            }
+        }
+        
+        mining.level = currentLevel.level;
+        mining.levelName = currentLevel.name;
+        mining.boost = currentLevel.boost;
+        mining.nextLevelThreshold = nextLevel ? nextLevel.threshold : currentLevel.threshold;
+        
+        if (nextLevel) {
+            const progress = ((totalStake - currentLevel.threshold) / (nextLevel.threshold - currentLevel.threshold)) * 100;
+            mining.levelProgress = Math.min(progress, 100);
+        } else {
+            mining.levelProgress = 100;
+        }
+    },
+
+    renderMiningPage() {
+        const mining = this.state.mining;
+        
+        // Update stats
+        const totalStakeEl = document.getElementById('miningTotalStake');
+        const totalRewardsEl = document.getElementById('miningTotalRewards');
+        const levelEl = document.getElementById('miningLevel');
+        const boostEl = document.getElementById('miningBoost');
+        
+        if (totalStakeEl) totalStakeEl.textContent = mining.totalStake.toFixed(0) + ' USDT';
+        if (totalRewardsEl) totalRewardsEl.textContent = mining.totalRewards.toFixed(2) + ' Token';
+        if (levelEl) levelEl.textContent = 'Lv' + mining.level;
+        if (boostEl) boostEl.textContent = '+' + mining.boost + '%';
+        
+        // Update level card
+        const levelBadge = document.getElementById('levelBadge');
+        const levelName = document.getElementById('levelName');
+        const levelProgress = document.getElementById('levelProgress');
+        const levelProgressText = document.getElementById('levelProgressText');
+        const levelBenefits = document.getElementById('levelBenefits');
+        
+        if (levelBadge) levelBadge.textContent = 'Lv' + mining.level;
+        if (levelName) levelName.textContent = mining.levelName;
+        if (levelProgress) levelProgress.style.width = mining.levelProgress + '%';
+        if (levelProgressText) {
+            const current = mining.totalStake.toFixed(0);
+            const next = mining.nextLevelThreshold.toFixed(0);
+            levelProgressText.textContent = `${current} / ${next} USDT`;
+        }
+        
+        if (levelBenefits) {
+            const benefits = this.getLevelBenefits(mining.level);
+            levelBenefits.innerHTML = benefits.map(b => `
+                <div class="benefit-item ${b.active ? 'active' : ''}">
+                    <span class="benefit-icon">${b.active ? '✅' : '🔒'}</span>
+                    <span>${b.text}</span>
+                </div>
+            `).join('');
+        }
+        
+        // Render level table
+        this.renderLevelTable();
+        
+        // Render rewards list
+        this.renderMiningRewards();
+    },
+
+    getLevelBenefits(level) {
+        const benefits = [
+            { level: 1, text: '基础挖矿奖励', active: level >= 1 },
+            { level: 2, text: '挖矿加成 +5%', active: level >= 2 },
+            { level: 3, text: '挖矿加成 +10%', active: level >= 3 },
+            { level: 4, text: '挖矿加成 +15%', active: level >= 4 },
+            { level: 5, text: '挖矿加成 +20% + 专属赛事池', active: level >= 5 }
+        ];
+        return benefits;
+    },
+
+    renderLevelTable() {
+        const table = document.getElementById('levelTable');
+        if (!table) return;
+        
+        const levels = [
+            { level: 1, name: '新手矿工', threshold: '0 USDT', boost: '基础', exclusive: false },
+            { level: 2, name: '初级矿工', threshold: '100 USDT', boost: '+5%', exclusive: false },
+            { level: 3, name: '中级矿工', threshold: '1,000 USDT', boost: '+10%', exclusive: false },
+            { level: 4, name: '高级矿工', threshold: '5,000 USDT', boost: '+15%', exclusive: false },
+            { level: 5, name: '矿场主', threshold: '20,000 USDT', boost: '+20%', exclusive: true }
+        ];
+        
+        const currentLevel = this.state.mining.level;
+        
+        table.innerHTML = levels.map(l => `
+            <div class="level-table-row ${l.level === currentLevel ? 'current' : ''} ${l.level < currentLevel ? 'completed' : ''}">
+                <div class="level-table-cell level-num">Lv${l.level}</div>
+                <div class="level-table-cell level-name">${l.name}</div>
+                <div class="level-table-cell level-threshold">${l.threshold}</div>
+                <div class="level-table-cell level-boost">${l.boost}</div>
+                <div class="level-table-cell level-exclusive">${l.exclusive ? '✨ 专属赛事池' : '-'}</div>
+            </div>
+        `).join('');
+    },
+
+    renderMiningRewards() {
+        const list = document.getElementById('miningRewardsList');
+        if (!list) return;
+        
+        const rewards = this.state.mining.rewards;
+        
+        if (rewards.length === 0) {
+            list.innerHTML = `
+                <div class="empty-state">
+                    <div class="empty-state-icon">⛏️</div>
+                    <h3>暂无挖矿记录</h3>
+                    <p>参与赛事预测，开始挖矿赚取 Token</p>
+                </div>
+            `;
+            return;
+        }
+        
+        list.innerHTML = rewards.map(reward => {
+            const now = new Date();
+            const unlockDate = new Date(reward.unlockDate);
+            const daysLeft = Math.ceil((unlockDate - now) / (1000 * 60 * 60 * 24));
+            const isUnlocked = daysLeft <= 0;
+            
+            return `
+                <div class="mining-reward-card">
+                    <div class="reward-header">
+                        <div class="reward-match">${reward.match}</div>
+                        <div class="reward-status ${isUnlocked ? 'unlocked' : 'locked'}">
+                            ${isUnlocked ? '可领取' : `${daysLeft}天后解锁`}
+                        </div>
+                    </div>
+                    <div class="reward-details">
+                        <div class="reward-detail">
+                            <span class="detail-label">下注金额</span>
+                            <span class="detail-value">${reward.stake} USDT</span>
+                        </div>
+                        <div class="reward-detail">
+                            <span class="detail-label">基础奖励</span>
+                            <span class="detail-value">${reward.baseReward} Token</span>
+                        </div>
+                        <div class="reward-detail">
+                            <span class="detail-label">加成后</span>
+                            <span class="detail-value accent">${reward.boostedReward} Token</span>
+                        </div>
+                    </div>
+                    <div class="reward-unlock-info">
+                        <div class="unlock-item">
+                            <span class="unlock-label">已解锁 (10%)</span>
+                            <span class="unlock-value">${reward.unlocked} Token</span>
+                        </div>
+                        <div class="unlock-item">
+                            <span class="unlock-label">线性释放 (90%)</span>
+                            <span class="unlock-value">${reward.locked} Token</span>
+                        </div>
+                    </div>
+                    ${isUnlocked && !reward.claimed ? `
+                        <button class="claim-reward-btn" data-reward-id="${reward.predictionId}">
+                            领取奖励
+                        </button>
+                    ` : reward.claimed ? `
+                        <span class="claimed-badge">已领取</span>
+                    ` : ''}
+                </div>
+            `;
+        }).join('');
+        
+        // Add claim button listeners
+        list.querySelectorAll('.claim-reward-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const rewardId = parseInt(e.target.dataset.rewardId);
+                this.claimMiningReward(rewardId);
+            });
+        });
+    },
+
+    claimMiningReward(rewardId) {
+        const reward = this.state.mining.rewards.find(r => r.predictionId === rewardId);
+        if (!reward || reward.claimed) return;
+        
+        reward.claimed = true;
+        this.state.mining.claimedRewards += parseFloat(reward.unlocked);
+        this.saveMiningData();
+        this.renderMiningPage();
+        
+        this.showToast(`成功领取 ${reward.unlocked} Token`, '🎉');
     },
 
     showToast(message, icon = '✅') {
