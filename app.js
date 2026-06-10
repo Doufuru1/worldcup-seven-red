@@ -1,12 +1,5 @@
-// World Cup 2026 Prediction Platform - App Logic
-// 更新内容：
-// 1. 添加平台机制页面
-// 2. 首页显示当天可下注赛事 + 下注规则
-// 3. 预测逻辑：开赛前可下注，比赛开始锁定
-// 4. 个人界面：增加领取奖励按钮给赢家
-
+// World Cup 2026 Prediction Platform - Mobile App Logic
 const App = {
-    // State
     state: {
         wallet: {
             connected: false,
@@ -18,10 +11,9 @@ const App = {
         leaderboard: [],
         currentMatch: null,
         selectedOutcome: null,
-        currentPage: 'home'
+        currentTab: 'home'
     },
 
-    // Teams data - 48 teams for 2026 World Cup
     teams: [
         { name: 'Argentina', flag: '🇦🇷', code: 'ARG', group: 'A' },
         { name: 'Mexico', flag: '🇲🇽', code: 'MEX', group: 'A' },
@@ -57,17 +49,15 @@ const App = {
         const matches = [];
         let matchId = 1;
 
-        // Generate group stage matches
         const groups = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'];
         groups.forEach(group => {
             const groupTeams = this.teams.filter(t => t.group === group);
             if (groupTeams.length >= 2) {
                 for (let i = 0; i < groupTeams.length; i++) {
                     for (let j = i + 1; j < groupTeams.length; j++) {
-                        // Create matches with different dates - some today, some upcoming, some finished
-                        const dayOffset = (matchId % 5) - 2; // -2, -1, 0, 1, 2 days from now
+                        const dayOffset = (matchId % 5) - 2;
                         const matchDate = new Date(now.getTime() + dayOffset * 24 * 60 * 60 * 1000);
-                        matchDate.setHours(14 + (matchId % 8), 0, 0, 0); // Different times
+                        matchDate.setHours(14 + (matchId % 8), 0, 0, 0);
 
                         const odds = {
                             home: (1.5 + Math.random() * 2).toFixed(2),
@@ -75,13 +65,11 @@ const App = {
                             away: (1.8 + Math.random() * 2.2).toFixed(2)
                         };
 
-                        // Determine status based on date
                         let status = 'upcoming';
                         let score = { home: 0, away: 0 };
                         let actualResult = null;
 
                         if (matchDate < now) {
-                            // Match has started or finished
                             const hoursSinceStart = (now - matchDate) / (1000 * 60 * 60);
                             if (hoursSinceStart < 2) {
                                 status = 'live';
@@ -89,7 +77,6 @@ const App = {
                             } else {
                                 status = 'finished';
                                 score = { home: Math.floor(Math.random() * 4), away: Math.floor(Math.random() * 4) };
-                                // Determine actual result
                                 if (score.home > score.away) actualResult = 'home';
                                 else if (score.home < score.away) actualResult = 'away';
                                 else actualResult = 'draw';
@@ -130,7 +117,6 @@ const App = {
             points: Math.floor(Math.random() * 50000) + 10000
         })).sort((a, b) => b.points - a.points);
 
-        // Update ranks after sorting
         this.state.leaderboard.forEach((user, index) => {
             user.rank = index + 1;
         });
@@ -140,17 +126,14 @@ const App = {
         const saved = localStorage.getItem('worldcup_predictions');
         if (saved) {
             this.state.predictions = JSON.parse(saved);
-            // Check for finished matches and update results
             this.updatePredictionResults();
         }
     },
 
     updatePredictionResults() {
-        const now = new Date();
         this.state.predictions.forEach(pred => {
             const match = this.state.matches.find(m => m.id === pred.matchId);
             if (match && match.status === 'finished' && pred.result === 'pending') {
-                // Determine if prediction is correct
                 const outcomeMap = {
                     [match.homeTeam.name + ' Win']: 'home',
                     'Draw': 'draw',
@@ -174,62 +157,82 @@ const App = {
     },
 
     setupEventListeners() {
-        // Navigation
-        document.querySelectorAll('.nav-link, .mobile-link').forEach(link => {
-            link.addEventListener('click', (e) => {
-                e.preventDefault();
-                const page = e.target.dataset.page || 'home';
-                this.navigate(page);
+        // Bottom nav
+        document.querySelectorAll('.bottom-nav-item').forEach(item => {
+            item.addEventListener('click', (e) => {
+                const tab = e.currentTarget.dataset.tab;
+                this.switchTab(tab);
             });
         });
 
-        // Mobile menu
-        const mobileMenuBtn = document.getElementById('mobileMenuBtn');
-        const mobileMenu = document.getElementById('mobileMenu');
-        if (mobileMenuBtn && mobileMenu) {
-            mobileMenuBtn.addEventListener('click', () => {
-                mobileMenu.classList.toggle('open');
+        // Filter tabs
+        document.querySelectorAll('.filter-tab').forEach(tab => {
+            tab.addEventListener('click', (e) => {
+                document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
+                e.target.classList.add('active');
+                this.renderMatches(e.target.dataset.filter);
+            });
+        });
+
+        // Rules toggle
+        const rulesToggle = document.getElementById('rulesToggle');
+        if (rulesToggle) {
+            rulesToggle.addEventListener('click', () => {
+                document.querySelector('.rules-banner-compact').classList.toggle('open');
             });
         }
 
         // Wallet buttons
-        const walletBtn = document.getElementById('walletBtn');
-        const mobileWalletBtn = document.getElementById('mobileWalletBtn');
-        if (walletBtn) walletBtn.addEventListener('click', () => this.openWalletModal());
-        if (mobileWalletBtn) mobileWalletBtn.addEventListener('click', () => this.openWalletModal());
+        document.getElementById('walletBtn')?.addEventListener('click', () => this.openWalletModal());
+        document.getElementById('connectWalletBtn')?.addEventListener('click', () => this.openWalletModal());
 
         // Wallet options
-        document.querySelectorAll('.wallet-option').forEach(option => {
+        document.querySelectorAll('.wallet-card').forEach(option => {
             option.addEventListener('click', () => this.connectWallet());
         });
 
-        // Modal close buttons
+        // Modal close
         document.getElementById('modalClose')?.addEventListener('click', () => this.closeModal());
         document.getElementById('walletModalClose')?.addEventListener('click', () => this.closeWalletModal());
 
         // Prediction options
-        document.querySelectorAll('.prediction-option').forEach(option => {
+        document.querySelectorAll('.odds-card').forEach(option => {
             option.addEventListener('click', (e) => this.selectOutcome(e.currentTarget.dataset.result));
         });
 
+        // Quick stake buttons
+        document.querySelectorAll('.quick-stake-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const amount = e.target.dataset.amount;
+                document.getElementById('stakeInput').value = amount;
+                this.updatePotentialWin();
+            });
+        });
+
         // Stake input
-        const stakeInput = document.getElementById('stakeInput');
-        if (stakeInput) {
-            stakeInput.addEventListener('input', () => this.updatePotentialWin());
-        }
+        document.getElementById('stakeInput')?.addEventListener('input', () => this.updatePotentialWin());
 
         // Submit prediction
-        const submitBtn = document.getElementById('submitPrediction');
-        if (submitBtn) {
-            submitBtn.addEventListener('click', () => this.placePrediction());
-        }
+        document.getElementById('submitPrediction')?.addEventListener('click', () => this.placePrediction());
 
-        // Filter buttons
-        document.querySelectorAll('.filter-btn').forEach(btn => {
+        // Menu items
+        document.querySelectorAll('.menu-item').forEach(item => {
+            item.addEventListener('click', (e) => {
+                const page = e.currentTarget.dataset.page;
+                if (page) {
+                    this.showFullPage(page);
+                }
+            });
+        });
+
+        // Back buttons
+        document.querySelectorAll('.back-btn').forEach(btn => {
             btn.addEventListener('click', (e) => {
-                document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-                e.target.classList.add('active');
-                this.filterMatches(e.target.dataset.filter);
+                const backTo = e.currentTarget.dataset.back;
+                this.hideFullPage();
+                if (backTo) {
+                    this.switchTab(backTo);
+                }
             });
         });
 
@@ -244,44 +247,50 @@ const App = {
         });
     },
 
-    navigate(page) {
-        this.state.currentPage = page;
-        
-        // Update nav links
-        document.querySelectorAll('.nav-link, .mobile-link').forEach(link => {
-            link.classList.toggle('active', link.dataset.page === page);
+    switchTab(tab) {
+        this.state.currentTab = tab;
+
+        // Update bottom nav
+        document.querySelectorAll('.bottom-nav-item').forEach(item => {
+            item.classList.toggle('active', item.dataset.tab === tab);
         });
 
-        // Show/hide pages
-        document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-        const targetPage = document.getElementById(page);
-        if (targetPage) targetPage.classList.add('active');
+        // Show/hide tab pages
+        document.querySelectorAll('.tab-page').forEach(p => p.classList.remove('active'));
+        const targetTab = document.getElementById(tab);
+        if (targetTab) targetTab.classList.add('active');
 
-        // Close mobile menu
-        document.getElementById('mobileMenu')?.classList.remove('open');
+        // Update content
+        if (tab === 'home') this.renderMatches('today');
+        if (tab === 'predictions') this.renderPredictions();
 
-        // Update page content
-        if (page === 'home') this.renderMatches('today');
-        if (page === 'predictions') this.renderPredictions();
-        if (page === 'leaderboard') this.renderLeaderboard();
+        // Scroll to top
+        document.querySelector('.app-content').scrollTop = 0;
+    },
 
-        window.scrollTo(0, 0);
+    showFullPage(pageId) {
+        const page = document.getElementById(pageId);
+        if (page) {
+            page.classList.add('active');
+        }
+    },
+
+    hideFullPage() {
+        document.querySelectorAll('.full-page').forEach(p => p.classList.remove('active'));
     },
 
     renderMatches(filter = 'today') {
-        const grid = document.getElementById('matchesGrid');
-        if (!grid) return;
+        const list = document.getElementById('matchesList');
+        if (!list) return;
 
         const now = new Date();
         let matches = this.state.matches;
 
         if (filter === 'today') {
-            // Show matches from today (same calendar day)
             const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
             const tomorrow = new Date(today.getTime() + 24 * 60 * 60 * 1000);
             matches = matches.filter(m => m.date >= today && m.date < tomorrow && m.status === 'upcoming');
         } else if (filter === 'upcoming') {
-            // Show future matches (not today)
             const tomorrow = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1);
             matches = matches.filter(m => m.date >= tomorrow && m.status === 'upcoming');
         } else if (filter === 'live') {
@@ -290,11 +299,10 @@ const App = {
             matches = matches.filter(m => m.status === 'finished');
         }
 
-        // Sort by date
         matches.sort((a, b) => a.date - b.date);
 
         if (matches.length === 0) {
-            grid.innerHTML = `
+            list.innerHTML = `
                 <div class="empty-state">
                     <div class="empty-state-icon">📭</div>
                     <h3>暂无赛事</h3>
@@ -304,10 +312,9 @@ const App = {
             return;
         }
 
-        grid.innerHTML = matches.map(match => this.createMatchCard(match)).join('');
+        list.innerHTML = matches.map(match => this.createMatchCard(match)).join('');
 
-        // Add click handlers
-        grid.querySelectorAll('.match-card').forEach(card => {
+        list.querySelectorAll('.match-card-compact').forEach(card => {
             card.addEventListener('click', () => this.openPredictionModal(parseInt(card.dataset.matchId)));
         });
     },
@@ -316,7 +323,7 @@ const App = {
         const isLive = match.status === 'live';
         const isFinished = match.status === 'finished';
         const isUpcoming = match.status === 'upcoming';
-        
+
         const timeStr = match.date.toLocaleString('zh-CN', {
             month: 'short',
             day: 'numeric',
@@ -324,89 +331,79 @@ const App = {
             minute: '2-digit'
         });
 
-        // Calculate time until match starts
         const now = new Date();
         const timeUntil = match.date - now;
         const hoursUntil = Math.floor(timeUntil / (1000 * 60 * 60));
         const minutesUntil = Math.floor((timeUntil % (1000 * 60 * 60)) / (1000 * 60));
-        
+
         let countdownText = '';
         if (isUpcoming && timeUntil > 0) {
             if (hoursUntil > 0) {
-                countdownText = `<span class="countdown">${hoursUntil}小时 ${minutesUntil}分钟后开始</span>`;
+                countdownText = `${hoursUntil}小时${minutesUntil}分钟后`;
             } else if (minutesUntil > 0) {
-                countdownText = `<span class="countdown">${minutesUntil}分钟后开始</span>`;
+                countdownText = `${minutesUntil}分钟后`;
             }
         }
 
-        let statusBadge = '';
+        let statusTag = '';
         if (isLive) {
-            statusBadge = '<span class="match-time live"><span class="live-dot"></span> 进行中</span>';
+            statusTag = '<span class="match-status-tag live">● 进行中</span>';
         } else if (isFinished) {
-            statusBadge = '<span class="match-time finished">已结束</span>';
+            statusTag = '<span class="match-status-tag finished">已结束</span>';
         } else {
-            statusBadge = `<span class="match-time">${timeStr}</span>${countdownText}`;
+            statusTag = `<span class="match-status-tag upcoming">${countdownText || timeStr}</span>`;
         }
 
-        let betButton = '';
+        let scoreDisplay = '<span class="match-vs">VS</span>';
+        if (isLive || isFinished) {
+            scoreDisplay = `<span class="match-score-large">${match.score.home} - ${match.score.away}</span>`;
+        }
+
+        let actionBtn = '';
         if (isUpcoming) {
-            betButton = `<button class="predict-btn ${!this.state.wallet.connected ? 'disabled' : ''}">
-                ${this.state.wallet.connected ? '立即下注' : '连接钱包后下注'}
-            </button>`;
+            actionBtn = `<button class="match-action-btn">立即下注</button>`;
         } else if (isLive) {
-            betButton = `<button class="predict-btn disabled" disabled>已锁定</button>`;
-        } else if (isFinished) {
-            betButton = `<button class="predict-btn finished">已开奖</button>`;
+            actionBtn = `<button class="match-action-btn" disabled>已锁定</button>`;
+        } else {
+            actionBtn = `<button class="match-action-btn" disabled>已结束</button>`;
         }
 
         return `
-            <div class="match-card ${isLive ? 'live' : ''} ${isFinished ? 'finished' : ''}" data-match-id="${match.id}">
-                <div class="match-status">
-                    <span class="match-stage">${match.stage} · ${match.group}组</span>
-                    ${statusBadge}
+            <div class="match-card-compact ${isLive ? 'live' : ''} ${isFinished ? 'finished' : ''}" data-match-id="${match.id}">
+                <div class="match-card-header">
+                    <span class="match-stage-tag">${match.stage} · ${match.group}组</span>
+                    ${statusTag}
                 </div>
-                <div class="match-teams">
-                    <div class="team">
-                        <span class="team-flag">${match.homeTeam.flag}</span>
-                        <div class="team-info">
-                            <span class="team-name">${match.homeTeam.name}</span>
-                            <span class="team-odds">${match.odds.home}x</span>
-                        </div>
+                <div class="match-teams-row">
+                    <div class="team-block home">
+                        <span class="team-flag-large">${match.homeTeam.flag}</span>
+                        <span class="team-name-compact">${match.homeTeam.name}</span>
                     </div>
-                    <div class="match-score">
-                        ${isLive || isFinished ? 
-                            `<span>${match.score.home}</span><span class="score-divider">-</span><span>${match.score.away}</span>` : 
-                            '<span class="score-divider">VS</span>'}
+                    <div class="match-center">
+                        ${scoreDisplay}
                     </div>
-                    <div class="team away">
-                        <span class="team-flag">${match.awayTeam.flag}</span>
-                        <div class="team-info">
-                            <span class="team-name">${match.awayTeam.name}</span>
-                            <span class="team-odds">${match.odds.away}x</span>
-                        </div>
+                    <div class="team-block away">
+                        <span class="team-flag-large">${match.awayTeam.flag}</span>
+                        <span class="team-name-compact">${match.awayTeam.name}</span>
                     </div>
                 </div>
-                <div class="match-odds">
-                    <button class="odds-btn" data-result="home">
-                        <span>主胜</span>
-                        <span class="odds-value">${match.odds.home}</span>
-                    </button>
-                    <button class="odds-btn" data-result="draw">
-                        <span>平局</span>
-                        <span class="odds-value">${match.odds.draw}</span>
-                    </button>
-                    <button class="odds-btn" data-result="away">
-                        <span>客胜</span>
-                        <span class="odds-value">${match.odds.away}</span>
-                    </button>
+                <div class="match-odds-row">
+                    <div class="odds-pill">
+                        <span class="odds-label">主胜</span>
+                        <span class="odds-num">${match.odds.home}x</span>
+                    </div>
+                    <div class="odds-pill">
+                        <span class="odds-label">平局</span>
+                        <span class="odds-num">${match.odds.draw}x</span>
+                    </div>
+                    <div class="odds-pill">
+                        <span class="odds-label">客胜</span>
+                        <span class="odds-num">${match.odds.away}x</span>
+                    </div>
                 </div>
-                ${betButton}
+                ${actionBtn}
             </div>
         `;
-    },
-
-    filterMatches(filter) {
-        this.renderMatches(filter);
     },
 
     openPredictionModal(matchId) {
@@ -419,7 +416,6 @@ const App = {
         const match = this.state.matches.find(m => m.id === matchId);
         if (!match) return;
 
-        // Check if match is upcoming (can bet)
         if (match.status !== 'upcoming') {
             if (match.status === 'live') {
                 this.showToast('比赛已开始，无法下注', '🔒');
@@ -432,56 +428,49 @@ const App = {
         this.state.currentMatch = match;
         this.state.selectedOutcome = null;
 
-        // Update match status banner
-        const statusBanner = document.getElementById('matchStatusBanner');
-        if (statusBanner) {
+        // Update status bar
+        const statusBar = document.getElementById('matchStatusBar');
+        if (statusBar) {
             const now = new Date();
             const timeUntil = match.date - now;
             const hoursUntil = Math.floor(timeUntil / (1000 * 60 * 60));
             const minutesUntil = Math.floor((timeUntil % (1000 * 60 * 60)) / (1000 * 60));
-            
-            let timeText = '';
-            if (hoursUntil > 0) {
-                timeText = `${hoursUntil}小时 ${minutesUntil}分钟后开始`;
-            } else if (minutesUntil > 0) {
-                timeText = `${minutesUntil}分钟后开始`;
-            } else {
-                timeText = '即将开始';
-            }
+            let timeText = hoursUntil > 0 ? `${hoursUntil}小时${minutesUntil}分钟后开始` : minutesUntil > 0 ? `${minutesUntil}分钟后开始` : '即将开始';
 
-            statusBanner.innerHTML = `
-                <div class="status-banner-content">
-                    <span class="status-icon">⏰</span>
-                    <span class="status-text">${timeText}</span>
-                    <span class="status-note">开赛前可下注，比赛开始后锁定</span>
-                </div>
+            statusBar.innerHTML = `
+                <span class="status-icon">⏰</span>
+                <span class="status-text">${timeText}</span>
+                <span class="status-note">开赛前可下注</span>
             `;
         }
 
-        // Update modal content
-        document.getElementById('homeTeamName').textContent = match.homeTeam.name;
-        document.getElementById('awayTeamName').textContent = match.awayTeam.name;
-        document.getElementById('homeOdds').textContent = match.odds.home + 'x';
-        document.getElementById('drawOdds').textContent = match.odds.draw + 'x';
-        document.getElementById('awayOdds').textContent = match.odds.away + 'x';
-
-        const preview = document.getElementById('modalMatchPreview');
-        if (preview) {
-            preview.innerHTML = `
-                <div class="preview-team">
+        // Update teams
+        const teamsLarge = document.getElementById('matchTeamsLarge');
+        if (teamsLarge) {
+            teamsLarge.innerHTML = `
+                <div class="team-large">
                     <span class="team-flag">${match.homeTeam.flag}</span>
                     <span class="team-name">${match.homeTeam.name}</span>
                 </div>
-                <span class="preview-vs">VS</span>
-                <div class="preview-team">
+                <div class="match-center-large">
+                    <span class="vs">VS</span>
+                </div>
+                <div class="team-large">
                     <span class="team-flag">${match.awayTeam.flag}</span>
                     <span class="team-name">${match.awayTeam.name}</span>
                 </div>
             `;
         }
 
+        // Update odds
+        document.getElementById('homeTeamName').textContent = match.homeTeam.name;
+        document.getElementById('awayTeamName').textContent = match.awayTeam.name;
+        document.getElementById('homeOdds').textContent = match.odds.home + 'x';
+        document.getElementById('drawOdds').textContent = match.odds.draw + 'x';
+        document.getElementById('awayOdds').textContent = match.odds.away + 'x';
+
         // Reset form
-        document.querySelectorAll('.prediction-option').forEach(opt => opt.classList.remove('selected'));
+        document.querySelectorAll('.odds-card').forEach(opt => opt.classList.remove('selected'));
         document.getElementById('stakeInput').value = '';
         document.getElementById('potentialWin').textContent = '0.00 USDT';
         document.getElementById('submitPrediction').disabled = true;
@@ -505,7 +494,6 @@ const App = {
     },
 
     connectWallet() {
-        // Simulate wallet connection
         this.state.wallet.connected = true;
         this.state.wallet.address = '0x' + Array(40).fill(0).map(() => Math.floor(Math.random() * 16).toString(16)).join('');
         this.state.wallet.balance = 10000;
@@ -513,31 +501,41 @@ const App = {
         this.updateWalletUI();
         this.closeWalletModal();
         this.showToast('钱包连接成功！', '✅');
-
-        // Re-render matches to update button states
-        this.renderMatches('today');
     },
 
     updateWalletUI() {
         const walletBtn = document.getElementById('walletBtn');
-        const mobileWalletBtn = document.getElementById('mobileWalletBtn');
+        const balanceDisplay = document.getElementById('walletBalanceDisplay');
+        const connectBtn = document.getElementById('connectWalletBtn');
+        const userName = document.getElementById('userName');
+        const userAddress = document.getElementById('userAddress');
 
         if (this.state.wallet.connected) {
             const shortAddress = this.state.wallet.address.slice(0, 6) + '...' + this.state.wallet.address.slice(-4);
+
             if (walletBtn) {
                 walletBtn.innerHTML = `<span class="wallet-icon">💼</span><span class="wallet-text">${shortAddress}</span>`;
                 walletBtn.classList.add('connected');
             }
-            if (mobileWalletBtn) {
-                mobileWalletBtn.innerHTML = `<span class="wallet-icon">💼</span><span class="wallet-text">${shortAddress}</span>`;
-                mobileWalletBtn.classList.add('connected');
+
+            if (balanceDisplay) {
+                balanceDisplay.innerHTML = `${this.state.wallet.balance.toFixed(2)} <span>USDT</span>`;
             }
+
+            if (connectBtn) {
+                connectBtn.innerHTML = '<span>✅</span><span>已连接</span>';
+                connectBtn.style.borderColor = 'var(--success)';
+                connectBtn.style.color = 'var(--success)';
+            }
+
+            if (userName) userName.textContent = '预测者';
+            if (userAddress) userAddress.textContent = shortAddress;
         }
     },
 
     selectOutcome(result) {
         this.state.selectedOutcome = result;
-        document.querySelectorAll('.prediction-option').forEach(opt => {
+        document.querySelectorAll('.odds-card').forEach(opt => {
             opt.classList.toggle('selected', opt.dataset.result === result);
         });
         this.updatePotentialWin();
@@ -571,7 +569,6 @@ const App = {
             return;
         }
 
-        // Check again if match is still upcoming
         if (match.status !== 'upcoming') {
             this.showToast('该赛事已无法下注', '🔒');
             this.closeModal();
@@ -608,9 +605,7 @@ const App = {
         this.closeModal();
         this.showToast('下注成功！', '✅');
         this.updateWalletUI();
-
-        // Navigate to predictions page
-        this.navigate('predictions');
+        this.switchTab('predictions');
     },
 
     claimReward(predictionId) {
@@ -627,7 +622,6 @@ const App = {
             return;
         }
 
-        // Add reward to balance
         const reward = parseFloat(prediction.potentialWin);
         this.state.wallet.balance += reward;
         prediction.claimed = true;
@@ -635,7 +629,7 @@ const App = {
 
         this.updateWalletUI();
         this.renderPredictions();
-        this.showToast(`成功领取 ${reward.toFixed(2)} USDT 奖励！`, '🎉');
+        this.showToast(`成功领取 ${reward.toFixed(2)} USDT`, '🎉');
     },
 
     renderPredictions() {
@@ -664,8 +658,8 @@ const App = {
             list.innerHTML = `
                 <div class="empty-state">
                     <div class="empty-state-icon">📋</div>
-                    <h3>暂无预测记录</h3>
-                    <p>开始预测赛事，查看你的历史记录</p>
+                    <h3>暂无预测</h3>
+                    <p>开始预测赛事，查看你的记录</p>
                 </div>
             `;
             return;
@@ -674,14 +668,14 @@ const App = {
         list.innerHTML = predictions.map(pred => {
             const statusClass = pred.result === 'won' ? 'won' : pred.result === 'lost' ? 'lost' : 'pending';
             const statusText = pred.result === 'won' ? '已中奖' : pred.result === 'lost' ? '未中奖' : '进行中';
-            
+
             let resultAmount = '';
             let claimButton = '';
-            
+
             if (pred.result === 'won') {
                 resultAmount = `+${pred.potentialWin} USDT`;
                 if (!pred.claimed) {
-                    claimButton = `<button class="claim-reward-btn" data-prediction-id="${pred.id}">领取奖励</button>`;
+                    claimButton = `<button class="claim-btn" data-prediction-id="${pred.id}">领取</button>`;
                 } else {
                     claimButton = `<span class="claimed-badge">已领取</span>`;
                 }
@@ -690,37 +684,30 @@ const App = {
             }
 
             return `
-                <div class="prediction-item ${statusClass}">
-                    <div class="prediction-match">
-                        <div class="prediction-teams">
-                            <span class="team-flag">${pred.homeTeam.flag}</span>
-                            <span class="team-name">${pred.homeTeam.name}</span>
-                            <span class="prediction-vs">vs</span>
-                            <span class="team-name">${pred.awayTeam.name}</span>
-                            <span class="team-flag">${pred.awayTeam.flag}</span>
+                <div class="prediction-card ${statusClass}">
+                    <div class="prediction-card-header">
+                        <div class="prediction-teams-compact">
+                            <span>${pred.homeTeam.flag}</span>
+                            <span>${pred.homeTeam.name}</span>
+                            <span style="color:var(--text-muted)">vs</span>
+                            <span>${pred.awayTeam.name}</span>
+                            <span>${pred.awayTeam.flag}</span>
                         </div>
+                        <span class="prediction-status-badge ${statusClass}">${statusText}</span>
                     </div>
-                    <div class="prediction-details">
-                        <div class="prediction-choice">
-                            <span class="choice-label">预测</span>
-                            <span class="choice-value">${pred.outcome}</span>
-                        </div>
-                        <div class="stake-info">
-                            <span class="stake-amount">${pred.stake} USDT</span>
-                            <span class="stake-odds">@${pred.odds}x</span>
-                        </div>
+                    <div class="prediction-details-row">
+                        <span class="prediction-choice">预测: <strong>${pred.outcome}</strong></span>
+                        <span class="prediction-stake">${pred.stake} USDT @ ${pred.odds}x</span>
                     </div>
-                    <div class="prediction-result ${statusClass}">
-                        <div class="result-status">${statusText}</div>
-                        <div class="result-amount">${resultAmount}</div>
+                    <div class="prediction-result-row">
+                        <span class="prediction-result-amount ${statusClass}">${resultAmount}</span>
                         ${claimButton}
                     </div>
                 </div>
             `;
         }).join('');
 
-        // Add claim button handlers
-        list.querySelectorAll('.claim-reward-btn').forEach(btn => {
+        list.querySelectorAll('.claim-btn').forEach(btn => {
             btn.addEventListener('click', (e) => {
                 e.stopPropagation();
                 const predId = parseInt(e.target.dataset.predictionId);
@@ -730,25 +717,21 @@ const App = {
     },
 
     renderLeaderboard() {
-        const tbody = document.getElementById('leaderboardBody');
-        if (!tbody) return;
+        const list = document.getElementById('leaderboardList');
+        if (!list) return;
 
-        tbody.innerHTML = this.state.leaderboard.map((user, index) => {
+        list.innerHTML = this.state.leaderboard.map((user, index) => {
             const rankClass = index === 0 ? 'rank-1' : index === 1 ? 'rank-2' : index === 2 ? 'rank-3' : 'rank-other';
             return `
-                <tr>
-                    <td><span class="rank ${rankClass}">${index + 1}</span></td>
-                    <td>
-                        <div class="predictor-cell">
-                            <span class="predictor-avatar">${user.avatar}</span>
-                            <span class="predictor-name">${user.name}</span>
-                        </div>
-                    </td>
-                    <td>${user.predictions}</td>
-                    <td>${user.correct}</td>
-                    <td>${user.accuracy}%</td>
-                    <td class="points-cell">${user.points.toLocaleString()}</td>
-                </tr>
+                <div class="leaderboard-item">
+                    <div class="leaderboard-rank ${rankClass}">${index + 1}</div>
+                    <span class="leaderboard-avatar">${user.avatar}</span>
+                    <div class="leaderboard-info">
+                        <div class="leaderboard-name">${user.name}</div>
+                        <div class="leaderboard-stats">${user.predictions}场 · ${user.correct}中 · ${user.accuracy}%</div>
+                    </div>
+                    <div class="leaderboard-points">${user.points.toLocaleString()}</div>
+                </div>
             `;
         }).join('');
     },
@@ -767,7 +750,6 @@ const App = {
     }
 };
 
-// Initialize when DOM is ready
 document.addEventListener('DOMContentLoaded', () => {
     App.init();
 });
