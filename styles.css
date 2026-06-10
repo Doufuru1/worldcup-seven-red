@@ -160,54 +160,123 @@ html, body {
     font-size: 0.875rem;
 }
 
-/* ===== Balance Card ===== */
-.balance-card {
-    background: var(--bg-card);
-    border: 1px solid var(--border);
+/* ===== Flash Card ===== */
+.flash-card {
+    background: linear-gradient(135deg, var(--accent) 0%, var(--accent-dim) 100%);
     border-radius: var(--radius-md);
     padding: 20px;
     margin-bottom: 12px;
-    text-align: center;
+    position: relative;
+    overflow: hidden;
+    animation: flashPulse 3s ease-in-out infinite;
 }
 
-.balance-label {
-    font-size: 0.75rem;
-    color: var(--text-muted);
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    margin-bottom: 8px;
+@keyframes flashPulse {
+    0%, 100% { box-shadow: 0 0 20px rgba(200, 255, 0, 0.3); }
+    50% { box-shadow: 0 0 40px rgba(200, 255, 0, 0.6); }
 }
 
-.balance-value {
-    font-size: 2rem;
-    font-weight: 800;
-    color: var(--accent);
-    margin-bottom: 12px;
+.flash-card::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: linear-gradient(
+        45deg,
+        transparent 30%,
+        rgba(255, 255, 255, 0.1) 50%,
+        transparent 70%
+    );
+    animation: flashShine 4s ease-in-out infinite;
 }
 
-.balance-value span {
-    font-size: 1rem;
-    font-weight: 600;
-    color: var(--text-secondary);
+@keyframes flashShine {
+    0% { transform: translateX(-100%) rotate(45deg); }
+    100% { transform: translateX(100%) rotate(45deg); }
 }
 
-.balance-actions {
-    display: flex;
-    justify-content: center;
-}
-
-.balance-action-btn {
+.flash-card-content {
     display: flex;
     align-items: center;
-    gap: 6px;
-    padding: 10px 20px;
-    border-radius: 20px;
-    border: 1px solid var(--accent);
-    background: var(--accent-glow);
-    color: var(--accent);
-    font-weight: 700;
+    gap: 12px;
+    margin-bottom: 12px;
+    position: relative;
+    z-index: 1;
+}
+
+.flash-icon {
+    font-size: 2.5rem;
+    animation: bounce 2s ease-in-out infinite;
+}
+
+@keyframes bounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-5px); }
+}
+
+.flash-text {
+    flex: 1;
+}
+
+.flash-title {
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: var(--bg-primary);
+    letter-spacing: -0.5px;
+}
+
+.flash-subtitle {
     font-size: 0.875rem;
-    cursor: pointer;
+    color: var(--bg-primary);
+    opacity: 0.8;
+    font-weight: 600;
+}
+
+.flash-slogan {
+    text-align: center;
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--bg-primary);
+    padding: 8px 0;
+    border-top: 1px solid rgba(0, 0, 0, 0.1);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+    margin-bottom: 12px;
+    position: relative;
+    z-index: 1;
+}
+
+.flash-stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    position: relative;
+    z-index: 1;
+}
+
+.flash-stat {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    padding: 8px;
+    background: rgba(0, 0, 0, 0.15);
+    border-radius: var(--radius-sm);
+}
+
+.flash-stat-value {
+    font-size: 1rem;
+    font-weight: 800;
+    color: var(--bg-primary);
+}
+
+.flash-stat-label {
+    font-size: 0.65rem;
+    color: var(--bg-primary);
+    opacity: 0.8;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
 }
 
 /* ===== Rules Banner ===== */
@@ -1358,18 +1427,119 @@ html, body {
     font-size: 0.8rem;
 }
 
-/* Scrollbar */
-::-webkit-scrollbar {
-    width: 4px;
+/* ===== Staking Section ===== */
+.staking-section {
+    margin-bottom: 16px;
 }
 
-::-webkit-scrollbar-track {
-    background: transparent;
+.staking-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: 16px;
 }
 
-::-webkit-scrollbar-thumb {
-    background: var(--border);
-    border-radius: 2px;
+.staking-info {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 12px;
+}
+
+.staking-stat {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: 10px;
+    background: var(--bg-hover);
+    border-radius: var(--radius-sm);
+}
+
+.staking-label {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+}
+
+.staking-value {
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+.staking-value.accent {
+    color: var(--accent);
+}
+
+.staking-input-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 12px;
+}
+
+.staking-input-wrapper input {
+    flex: 1;
+    padding: 12px;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border);
+    background: var(--bg-hover);
+    color: var(--text-primary);
+    font-size: 1rem;
+    font-weight: 600;
+}
+
+.staking-currency {
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+    font-weight: 600;
+}
+
+.staking-benefits {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-bottom: 12px;
+}
+
+.staking-benefit {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 10px;
+    background: var(--bg-hover);
+    border-radius: var(--radius-sm);
+    font-size: 0.8rem;
+}
+
+.staking-benefit.active {
+    border: 1px solid var(--accent);
+    background: var(--accent-glow);
+}
+
+.benefit-level {
+    color: var(--text-secondary);
+}
+
+.benefit-days {
+    font-weight: 700;
+    color: var(--accent);
+}
+
+.staking-btn {
+    width: 100%;
+    padding: 12px;
+    border-radius: var(--radius-sm);
+    border: none;
+    background: var(--accent);
+    color: var(--bg-primary);
+    font-weight: 700;
+    font-size: 0.875rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.staking-btn:active {
+    transform: scale(0.98);
 }
 
 /* ===== Mining Pool Styles ===== */

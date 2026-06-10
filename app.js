@@ -18,7 +18,15 @@ const App = {
             nextLevelThreshold: 100,
             boost: 0,
             rewards: [],
-            claimedRewards: 0
+            claimedRewards: 0,
+            stakedAmount: 0
+        },
+        platform: {
+            totalPoolAmount: 0,
+            totalBurnLP: 0,
+            insurancePool: 100000,
+            totalPredictions: 0,
+            totalBuyback: 0
         },
         currentMatch: null,
         selectedOutcome: null,
@@ -54,6 +62,7 @@ const App = {
         this.renderLeaderboard();
         this.renderPredictions();
         this.renderMiningPage();
+        this.updatePlatformStats();
         this.updateWalletUI();
     },
 
@@ -233,8 +242,11 @@ const App = {
         // Stake input
         document.getElementById('stakeInput')?.addEventListener('input', () => this.updatePotentialWin());
 
-        // Submit prediction
-        document.getElementById('submitPrediction')?.addEventListener('click', () => this.placePrediction());
+        // Staking button
+        document.getElementById('stakeTokensBtn')?.addEventListener('click', () => this.stakeTokens());
+        
+        // Stake input
+        document.getElementById('stakeTokenInput')?.addEventListener('input', () => this.updateStakingBenefits());
 
         // Menu items
         document.querySelectorAll('.menu-item').forEach(item => {
@@ -897,11 +909,50 @@ const App = {
             `).join('');
         }
         
+        // Update staking info
+        const stakedAmountEl = document.getElementById('stakedAmount');
+        const releaseDaysEl = document.getElementById('releaseDays');
+        
+        if (stakedAmountEl) stakedAmountEl.textContent = mining.stakedAmount + ' Token';
+        if (releaseDaysEl) releaseDaysEl.textContent = this.getReleaseDays() + ' 天';
+        
+        this.updateStakingBenefits();
+        
         // Render level table
         this.renderLevelTable();
         
         // Render rewards list
         this.renderMiningRewards();
+    },
+
+    updateStakingBenefits() {
+        const input = document.getElementById('stakeTokenInput');
+        const benefits = document.querySelectorAll('.staking-benefit');
+        if (!input || !benefits.length) return;
+        
+        const amount = parseInt(input.value) || 0;
+        const levels = [0, 500, 1000, 2000, 5000, 10000];
+        
+        benefits.forEach((benefit, index) => {
+            benefit.classList.toggle('active', amount >= levels[index]);
+        });
+    },
+
+    stakeTokens() {
+        const input = document.getElementById('stakeTokenInput');
+        const amount = parseInt(input.value) || 0;
+        
+        if (amount <= 0) {
+            this.showToast('请输入有效的质押数量', '⚠️');
+            return;
+        }
+        
+        this.state.mining.stakedAmount += amount;
+        this.saveMiningData();
+        this.renderMiningPage();
+        
+        input.value = '';
+        this.showToast(`成功质押 ${amount} Token，释放周期缩短至 ${this.getReleaseDays()} 天`, '🎉');
     },
 
     getLevelBenefits(level) {
@@ -1025,6 +1076,149 @@ const App = {
         this.renderMiningPage();
         
         this.showToast(`成功领取 ${reward.unlocked} Token`, '🎉');
+    },
+
+    // ===== Platform Stats =====
+    updatePlatformStats() {
+        const platform = this.state.platform;
+        
+        // Calculate from predictions
+        this.state.predictions.forEach(pred => {
+            platform.totalPoolAmount += pred.stake * 0.95;
+            platform.totalBurnLP += pred.stake * 0.05;
+            platform.totalBuyback += pred.stake * 0.05;
+        });
+        
+        platform.totalPredictions = this.state.predictions.length;
+        
+        // Update UI
+        const totalPoolEl = document.getElementById('totalPoolAmount');
+        const burnLPEl = document.getElementById('totalBurnLP');
+        const insuranceEl = document.getElementById('insurancePool');
+        
+        if (totalPoolEl) totalPoolEl.textContent = this.formatNumber(platform.totalPoolAmount) + ' USDT';
+        if (burnLPEl) burnLPEl.textContent = this.formatNumber(platform.totalBurnLP) + ' LP';
+        if (insuranceEl) insuranceEl.textContent = this.formatNumber(platform.insurancePool) + ' USDT';
+    },
+
+    formatNumber(num) {
+        if (num >= 1000000) return (num / 1000000).toFixed(1) + 'M';
+        if (num >= 1000) return (num / 1000).toFixed(1) + 'K';
+        return num.toFixed(0);
+    },
+
+    // ===== Enhanced Prediction with Pool Mechanism =====
+    placePrediction() {
+        const stake = parseFloat(document.getElementById('stakeInput').value);
+        const match = this.state.currentMatch;
+        const outcome = this.state.selectedOutcome;
+
+        if (!match || !outcome || !stake || stake <= 0) return;
+        if (stake > this.state.wallet.balance) {
+            this.showToast('余额不足', '❌');
+            return;
+        }
+
+        if (match.status !== 'upcoming') {
+            this.showToast('该赛事已无法下注', '🔒');
+            this.closeModal();
+            return;
+        }
+
+        // Check minimum stake for mining (10 USDT)
+        const isValidMining = stake >= 10;
+        
+        // Check odds >= 1.05
+        const odds = parseFloat(match.odds[outcome]);
+        const isValidOdds = odds >= 1.05;
+
+        const outcomeNames = {
+            home: match.homeTeam.name + ' Win',
+            draw: 'Draw',
+            away: match.awayTeam.name + ' Win'
+        };
+
+        // Calculate pool distribution
+        const burnLPAmount = stake * 0.05; // 5% for buyback + LP
+        const poolAmount = stake * 0.95; // 95% into prize pool
+
+        const prediction = {
+            id: Date.now(),
+            matchId: match.id,
+            match: `${match.homeTeam.name} vs ${match.awayTeam.name}`,
+            homeTeam: match.homeTeam,
+            awayTeam: match.awayTeam,
+            outcome: outcomeNames[outcome],
+            odds: odds,
+            stake: stake,
+            potentialWin: (stake * odds).toFixed(2),
+            result: 'pending',
+            claimed: false,
+            date: new Date().toISOString(),
+            matchDate: match.date.toISOString(),
+            // Enhanced fields
+            isValidMining: isValidMining && isValidOdds,
+            burnLPAmount: burnLPAmount.toFixed(2),
+            poolAmount: poolAmount.toFixed(2),
+            miningReward: 0,
+            miningBoost: this.state.mining.boost
+        };
+
+        // Update platform stats
+        this.state.platform.totalPoolAmount += poolAmount;
+        this.state.platform.totalBurnLP += burnLPAmount;
+        this.state.platform.totalBuyback += burnLPAmount;
+        this.state.platform.totalPredictions++;
+
+        this.state.predictions.unshift(prediction);
+        this.state.wallet.balance -= stake;
+        
+        // Calculate mining reward if valid
+        if (prediction.isValidMining) {
+            const baseReward = stake * 0.02;
+            const boostedReward = baseReward * (1 + this.state.mining.boost / 100);
+            prediction.miningReward = boostedReward.toFixed(2);
+            
+            // Add to mining rewards
+            this.state.mining.rewards.push({
+                predictionId: prediction.id,
+                match: prediction.match,
+                stake: stake,
+                baseReward: baseReward.toFixed(2),
+                boostedReward: boostedReward.toFixed(2),
+                unlocked: (boostedReward * 0.1).toFixed(2),
+                locked: (boostedReward * 0.9).toFixed(2),
+                released: 0,
+                createdAt: new Date().toISOString(),
+                unlockDate: new Date(Date.now() + 180 * 24 * 60 * 60 * 1000).toISOString(),
+                claimed: false,
+                stakedAmount: this.state.mining.stakedAmount
+            });
+            
+            this.state.mining.totalRewards += boostedReward;
+            this.state.mining.totalStake += stake;
+            this.updateMiningLevel();
+        }
+        
+        this.savePredictions();
+        this.saveMiningData();
+        this.updatePlatformStats();
+
+        this.closeModal();
+        this.showToast(`下注成功！${isValidMining && isValidOdds ? '已激活挖矿' : ''}`, '✅');
+        this.updateWalletUI();
+        this.switchTab('predictions');
+    },
+
+    // ===== Staking for Accelerated Release =====
+    getReleaseDays() {
+        const staked = this.state.mining.stakedAmount;
+        if (staked >= 10000) return 30;
+        if (staked >= 5000) return 60;
+        if (staked >= 2000) return 90;
+        if (staked >= 1000) return 120;
+        if (staked >= 500) return 150;
+        return 180;
     },
 
     showToast(message, icon = '✅') {
