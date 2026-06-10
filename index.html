@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>World Cup 2026 - Prediction Platform</title>
+    <title>World Cup 2026 - 赛事预测平台</title>
     <link rel="stylesheet" href="styles.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
@@ -17,14 +17,15 @@
                 <span class="brand-text">WorldCup<span class="accent">2026</span></span>
             </div>
             <div class="nav-links">
-                <a href="#" class="nav-link active" data-page="home">Matches</a>
-                <a href="#predictions" class="nav-link" data-page="predictions">My Predictions</a>
-                <a href="#leaderboard" class="nav-link" data-page="leaderboard">Leaderboard</a>
+                <a href="#" class="nav-link active" data-page="home">赛事</a>
+                <a href="#mechanism" class="nav-link" data-page="mechanism">平台机制</a>
+                <a href="#predictions" class="nav-link" data-page="predictions">我的预测</a>
+                <a href="#leaderboard" class="nav-link" data-page="leaderboard">排行榜</a>
             </div>
             <div class="nav-wallet">
                 <button id="walletBtn" class="wallet-btn">
                     <span class="wallet-icon">🔌</span>
-                    <span class="wallet-text">Connect Wallet</span>
+                    <span class="wallet-text">连接钱包</span>
                 </button>
             </div>
             <button class="mobile-menu-btn" id="mobileMenuBtn">☰</button>
@@ -32,12 +33,13 @@
 
         <!-- Mobile Menu -->
         <div class="mobile-menu" id="mobileMenu">
-            <a href="#" class="mobile-link active" data-page="home">Matches</a>
-            <a href="#predictions" class="mobile-link" data-page="predictions">My Predictions</a>
-            <a href="#leaderboard" class="mobile-link" data-page="leaderboard">Leaderboard</a>
+            <a href="#" class="mobile-link active" data-page="home">赛事</a>
+            <a href="#mechanism" class="mobile-link" data-page="mechanism">平台机制</a>
+            <a href="#predictions" class="mobile-link" data-page="predictions">我的预测</a>
+            <a href="#leaderboard" class="mobile-link" data-page="leaderboard">排行榜</a>
             <button id="mobileWalletBtn" class="wallet-btn mobile-wallet">
                 <span class="wallet-icon">🔌</span>
-                <span class="wallet-text">Connect Wallet</span>
+                <span class="wallet-text">连接钱包</span>
             </button>
         </div>
 
@@ -46,15 +48,37 @@
             <!-- Home Page - Matches -->
             <section id="home" class="page active">
                 <div class="page-header">
-                    <h1>Upcoming Matches</h1>
-                    <p class="subtitle">Place your predictions on World Cup 2026 matches</p>
+                    <h1>今日可下注赛事</h1>
+                    <p class="subtitle">选择赛事，预测结果，赢取奖励</p>
+                </div>
+
+                <!-- Betting Rules Banner -->
+                <div class="rules-banner">
+                    <div class="rules-banner-header">
+                        <span class="rules-icon">📋</span>
+                        <span class="rules-title">下注规则</span>
+                    </div>
+                    <div class="rules-list">
+                        <div class="rule-item">
+                            <span class="rule-icon">✅</span>
+                            <span class="rule-text">开赛前可下注：胜 / 平 / 负</span>
+                        </div>
+                        <div class="rule-item">
+                            <span class="rule-icon">🔒</span>
+                            <span class="rule-text">比赛开始后锁定，不可下注</span>
+                        </div>
+                        <div class="rule-item">
+                            <span class="rule-icon">🎁</span>
+                            <span class="rule-text">比赛结束后开奖，赢家可领取奖励</span>
+                        </div>
+                    </div>
                 </div>
                 
                 <div class="filters">
-                    <button class="filter-btn active" data-filter="all">All Matches</button>
-                    <button class="filter-btn" data-filter="group">Group Stage</button>
-                    <button class="filter-btn" data-filter="knockout">Knockout</button>
-                    <button class="filter-btn" data-filter="live">Live Now</button>
+                    <button class="filter-btn active" data-filter="today">今日赛事</button>
+                    <button class="filter-btn" data-filter="upcoming">即将开始</button>
+                    <button class="filter-btn" data-filter="live">进行中</button>
+                    <button class="filter-btn" data-filter="finished">已结束</button>
                 </div>
 
                 <div class="matches-grid" id="matchesGrid">
@@ -62,33 +86,185 @@
                 </div>
             </section>
 
+            <!-- Mechanism Page -->
+            <section id="mechanism" class="page">
+                <div class="page-header">
+                    <h1>平台机制</h1>
+                    <p class="subtitle">了解 WorldCup 2026 预测平台的核心机制</p>
+                </div>
+
+                <div class="mechanism-content">
+                    <!-- Core Mechanism -->
+                    <div class="mechanism-section">
+                        <h2 class="mechanism-section-title">
+                            <span class="mechanism-icon">⚽</span>
+                            核心博弈机制
+                        </h2>
+                        <div class="mechanism-cards">
+                            <div class="mechanism-card">
+                                <div class="mechanism-card-icon">🎯</div>
+                                <h3>预测用户</h3>
+                                <p>使用 USDT 参与赛事结果预测，可选择：</p>
+                                <ul>
+                                    <li>胜负预测（胜/平/负）</li>
+                                    <li>比分预测</li>
+                                    <li>晋级预测</li>
+                                    <li>冠军预测</li>
+                                    <li>多场组合预测</li>
+                                </ul>
+                                <p class="mechanism-highlight">预测正确获得奖金，错误损失本金</p>
+                            </div>
+                            <div class="mechanism-card">
+                                <div class="mechanism-card-icon">🛡️</div>
+                                <h3>保险池投资者</h3>
+                                <p>由外部投资者注入 USDT 组成：</p>
+                                <ul>
+                                    <li>承接赛事赔付风险</li>
+                                    <li>赚取风险收益</li>
+                                    <li>平台捕获交易热度</li>
+                                </ul>
+                                <p class="mechanism-highlight">风险承接资金，保障赔付能力</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Betting Rules -->
+                    <div class="mechanism-section">
+                        <h2 class="mechanism-section-title">
+                            <span class="mechanism-icon">📋</span>
+                            下注规则
+                        </h2>
+                        <div class="rules-timeline">
+                            <div class="timeline-item">
+                                <div class="timeline-dot active"></div>
+                                <div class="timeline-content">
+                                    <h4>赛前下注</h4>
+                                    <p>比赛开始前，用户可选择 <strong>胜 / 平 / 负</strong> 进行下注</p>
+                                    <p class="timeline-note">使用 USDT 下注，最低 1 USDT</p>
+                                </div>
+                            </div>
+                            <div class="timeline-item">
+                                <div class="timeline-dot"></div>
+                                <div class="timeline-content">
+                                    <h4>比赛锁定</h4>
+                                    <p>比赛开始后，所有下注通道 <strong>立即关闭</strong></p>
+                                    <p class="timeline-note">无法新增或修改预测</p>
+                                </div>
+                            </div>
+                            <div class="timeline-item">
+                                <div class="timeline-dot"></div>
+                                <div class="timeline-content">
+                                    <h4>赛后开奖</h4>
+                                    <p>比赛结束后，系统根据实际结果 <strong>自动开奖</strong></p>
+                                    <p class="timeline-note">预测正确的用户可领取奖励</p>
+                                </div>
+                            </div>
+                            <div class="timeline-item">
+                                <div class="timeline-dot"></div>
+                                <div class="timeline-content">
+                                    <h4>领取奖励</h4>
+                                    <p>赢家在个人界面点击 <strong>领取奖励</strong> 按钮</p>
+                                    <p class="timeline-note">奖金自动发放到钱包</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Economic Model -->
+                    <div class="mechanism-section">
+                        <h2 class="mechanism-section-title">
+                            <span class="mechanism-icon">💰</span>
+                            经济模型
+                        </h2>
+                        <div class="mechanism-cards">
+                            <div class="mechanism-card">
+                                <div class="mechanism-card-icon">📈</div>
+                                <h3>动态赔率</h3>
+                                <p>根据下注金额实时调整赔率：</p>
+                                <ul>
+                                    <li>下注越多，赔率越低</li>
+                                    <li>冷门选项，赔率更高</li>
+                                    <li>实时反映市场热度</li>
+                                </ul>
+                            </div>
+                            <div class="mechanism-card">
+                                <div class="mechanism-card-icon">🔄</div>
+                                <h3>回购销毁</h3>
+                                <p>平台 Token 价值闭环：</p>
+                                <ul>
+                                    <li>下注活跃产生手续费</li>
+                                    <li>保险池盈利回购 Token</li>
+                                    <li>定期销毁减少流通</li>
+                                </ul>
+                            </div>
+                            <div class="mechanism-card">
+                                <div class="mechanism-card-icon">🔒</div>
+                                <h3>质押权益</h3>
+                                <p>Token 持有者权益：</p>
+                                <ul>
+                                    <li>质押获得平台分红</li>
+                                    <li>参与治理投票</li>
+                                    <li>享受手续费折扣</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Platform Stats -->
+                    <div class="mechanism-section">
+                        <h2 class="mechanism-section-title">
+                            <span class="mechanism-icon">📊</span>
+                            平台数据
+                        </h2>
+                        <div class="platform-stats">
+                            <div class="platform-stat">
+                                <div class="platform-stat-value" id="totalMatches">104</div>
+                                <div class="platform-stat-label">总赛事</div>
+                            </div>
+                            <div class="platform-stat">
+                                <div class="platform-stat-value" id="totalTeams">48</div>
+                                <div class="platform-stat-label">参赛球队</div>
+                            </div>
+                            <div class="platform-stat">
+                                <div class="platform-stat-value" id="platformPool">$10M+</div>
+                                <div class="platform-stat-label">保险池规模</div>
+                            </div>
+                            <div class="platform-stat">
+                                <div class="platform-stat-value" id="platformUsers">50K+</div>
+                                <div class="platform-stat-label">预测用户</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
             <!-- Predictions Page -->
             <section id="predictions" class="page">
                 <div class="page-header">
-                    <h1>My Predictions</h1>
-                    <p class="subtitle">Track your prediction history and results</p>
+                    <h1>我的预测</h1>
+                    <p class="subtitle">查看预测历史、胜率统计、领取奖励</p>
                 </div>
 
                 <div class="stats-cards">
                     <div class="stat-card">
                         <div class="stat-icon">🎯</div>
                         <div class="stat-value" id="totalPredictions">0</div>
-                        <div class="stat-label">Total Predictions</div>
+                        <div class="stat-label">总预测数</div>
                     </div>
                     <div class="stat-card">
                         <div class="stat-icon">✅</div>
                         <div class="stat-value" id="correctPredictions">0</div>
-                        <div class="stat-label">Correct</div>
+                        <div class="stat-label">预测正确</div>
                     </div>
                     <div class="stat-card">
                         <div class="stat-icon">📊</div>
                         <div class="stat-value" id="accuracyRate">0%</div>
-                        <div class="stat-label">Accuracy</div>
+                        <div class="stat-label">准确率</div>
                     </div>
                     <div class="stat-card">
-                        <div class="stat-icon">🏆</div>
-                        <div class="stat-value" id="totalPoints">0</div>
-                        <div class="stat-label">Points</div>
+                        <div class="stat-icon">💰</div>
+                        <div class="stat-value" id="totalWinnings">0</div>
+                        <div class="stat-label">累计奖励</div>
                     </div>
                 </div>
 
@@ -100,20 +276,20 @@
             <!-- Leaderboard Page -->
             <section id="leaderboard" class="page">
                 <div class="page-header">
-                    <h1>Leaderboard</h1>
-                    <p class="subtitle">Top predictors competing for glory</p>
+                    <h1>排行榜</h1>
+                    <p class="subtitle">顶级预测者排名</p>
                 </div>
 
                 <div class="leaderboard-table-container">
                     <table class="leaderboard-table">
                         <thead>
                             <tr>
-                                <th>Rank</th>
-                                <th>Predictor</th>
-                                <th>Predictions</th>
-                                <th>Correct</th>
-                                <th>Accuracy</th>
-                                <th>Points</th>
+                                <th>排名</th>
+                                <th>预测者</th>
+                                <th>预测数</th>
+                                <th>正确数</th>
+                                <th>准确率</th>
+                                <th>积分</th>
                             </tr>
                         </thead>
                         <tbody id="leaderboardBody">
@@ -128,10 +304,13 @@
         <div class="modal-overlay" id="predictionModal">
             <div class="modal">
                 <div class="modal-header">
-                    <h2>Place Your Prediction</h2>
+                    <h2>下注预测</h2>
                     <button class="modal-close" id="modalClose">×</button>
                 </div>
                 <div class="modal-body">
+                    <div class="match-status-banner" id="matchStatusBanner">
+                        <!-- Match status injected by JS -->
+                    </div>
                     <div class="match-preview" id="modalMatchPreview">
                         <!-- Match preview injected by JS -->
                     </div>
@@ -141,7 +320,7 @@
                             <span class="option-odds" id="homeOdds"></span>
                         </button>
                         <button class="prediction-option" data-result="draw">
-                            <span class="option-label">Draw</span>
+                            <span class="option-label">平局</span>
                             <span class="option-odds" id="drawOdds"></span>
                         </button>
                         <button class="prediction-option" data-result="away">
@@ -150,19 +329,19 @@
                         </button>
                     </div>
                     <div class="stake-input">
-                        <label>Stake Amount</label>
+                        <label>下注金额</label>
                         <div class="input-group">
                             <input type="number" id="stakeInput" placeholder="0.00" min="1" step="0.01">
-                            <span class="input-suffix">USDC</span>
+                            <span class="input-suffix">USDT</span>
                         </div>
-                        <div class="balance-hint">Balance: <span id="walletBalance">0.00</span> USDC</div>
+                        <div class="balance-hint">余额: <span id="walletBalance">0.00</span> USDT</div>
                     </div>
                     <div class="potential-win">
-                        <span>Potential Win:</span>
-                        <span class="win-amount" id="potentialWin">0.00 USDC</span>
+                        <span>预计奖金:</span>
+                        <span class="win-amount" id="potentialWin">0.00 USDT</span>
                     </div>
                     <button class="submit-prediction-btn" id="submitPrediction" disabled>
-                        Place Prediction
+                        确认下注
                     </button>
                 </div>
             </div>
@@ -172,7 +351,7 @@
         <div class="modal-overlay" id="walletModal">
             <div class="modal wallet-modal">
                 <div class="modal-header">
-                    <h2>Connect Wallet</h2>
+                    <h2>连接钱包</h2>
                     <button class="modal-close" id="walletModalClose">×</button>
                 </div>
                 <div class="modal-body">
@@ -197,7 +376,7 @@
         <!-- Toast Notification -->
         <div class="toast" id="toast">
             <span class="toast-icon" id="toastIcon">✅</span>
-            <span class="toast-message" id="toastMessage">Prediction placed!</span>
+            <span class="toast-message" id="toastMessage">下注成功！</span>
         </div>
     </div>
 
