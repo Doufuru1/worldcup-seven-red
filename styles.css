@@ -7,18 +7,18 @@
 }
 
 :root {
-    --bg-primary: #0a0a0a;
-    --bg-secondary: #111111;
-    --bg-card: #141414;
-    --bg-hover: #1a1a1a;
-    --accent: #c8ff00;
-    --accent-dim: #a8d800;
-    --accent-glow: rgba(200, 255, 0, 0.15);
+    --bg-primary: #0a0e27;
+    --bg-secondary: #0f1535;
+    --bg-card: #131a3d;
+    --bg-hover: #1a2347;
+    --accent: #ffd700;
+    --accent-dim: #e6c200;
+    --accent-glow: rgba(255, 215, 0, 0.15);
     --text-primary: #ffffff;
-    --text-secondary: #a0a0a0;
-    --text-muted: #666666;
-    --border: #222222;
-    --border-light: #2a2a2a;
+    --text-secondary: #a0aec0;
+    --text-muted: #64748b;
+    --border: #1e2a5a;
+    --border-light: #2a3a6a;
     --success: #22c55e;
     --danger: #ef4444;
     --warning: #f59e0b;
@@ -26,7 +26,7 @@
     --radius-md: 16px;
     --radius-lg: 20px;
     --shadow: 0 4px 24px rgba(0, 0, 0, 0.4);
-    --shadow-glow: 0 0 20px rgba(200, 255, 0, 0.1);
+    --shadow-glow: 0 0 20px rgba(255, 215, 0, 0.1);
 }
 
 html, body {
@@ -165,9 +165,10 @@ html, body {
 
 /* ===== Flash Card ===== */
 .flash-card {
-    background: linear-gradient(135deg, var(--accent) 0%, var(--accent-dim) 100%);
+    background: linear-gradient(135deg, #131a3d 0%, #1a2347 50%, #0f1535 100%);
+    border: 1px solid rgba(255, 215, 0, 0.3);
     border-radius: var(--radius-md);
-    padding: 20px;
+    padding: 24px 20px;
     margin-bottom: 12px;
     position: relative;
     overflow: hidden;
@@ -175,8 +176,8 @@ html, body {
 }
 
 @keyframes flashPulse {
-    0%, 100% { box-shadow: 0 0 20px rgba(200, 255, 0, 0.3); }
-    50% { box-shadow: 0 0 40px rgba(200, 255, 0, 0.6); }
+    0%, 100% { box-shadow: 0 0 20px rgba(255, 215, 0, 0.2); }
+    50% { box-shadow: 0 0 40px rgba(255, 215, 0, 0.4); }
 }
 
 .flash-card::before {
@@ -189,7 +190,7 @@ html, body {
     background: linear-gradient(
         45deg,
         transparent 30%,
-        rgba(255, 255, 255, 0.1) 50%,
+        rgba(255, 215, 0, 0.05) 50%,
         transparent 70%
     );
     animation: flashShine 4s ease-in-out infinite;
@@ -203,23 +204,23 @@ html, body {
 .flash-card-content {
     display: flex;
     align-items: center;
-    gap: 12px;
-    margin-bottom: 12px;
+    gap: 16px;
+    margin-bottom: 16px;
     position: relative;
     z-index: 1;
 }
 
 .flash-icon {
-    font-size: 2.5rem;
     animation: bounce 2s ease-in-out infinite;
 }
 
 .flash-logo-img {
-    width: 60px;
-    height: 60px;
+    width: 80px;
+    height: 80px;
     border-radius: 50%;
     object-fit: cover;
-    border: 2px solid rgba(255, 255, 255, 0.3);
+    border: 2px solid rgba(255, 215, 0, 0.4);
+    box-shadow: 0 0 20px rgba(255, 215, 0, 0.3);
 }
 
 @keyframes bounce {
@@ -234,14 +235,13 @@ html, body {
 .flash-title {
     font-size: 1.5rem;
     font-weight: 800;
-    color: var(--bg-primary);
+    color: var(--accent);
     letter-spacing: -0.5px;
 }
 
 .flash-subtitle {
     font-size: 0.875rem;
-    color: var(--bg-primary);
-    opacity: 0.8;
+    color: var(--text-secondary);
     font-weight: 600;
 }
 
@@ -249,11 +249,11 @@ html, body {
     text-align: center;
     font-size: 1rem;
     font-weight: 700;
-    color: var(--bg-primary);
-    padding: 8px 0;
-    border-top: 1px solid rgba(0, 0, 0, 0.1);
-    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
-    margin-bottom: 12px;
+    color: var(--accent);
+    padding: 10px 0;
+    border-top: 1px solid rgba(255, 215, 0, 0.2);
+    border-bottom: 1px solid rgba(255, 215, 0, 0.2);
+    margin-bottom: 16px;
     position: relative;
     z-index: 1;
 }
@@ -271,20 +271,21 @@ html, body {
     flex-direction: column;
     align-items: center;
     gap: 4px;
-    padding: 8px;
-    background: rgba(0, 0, 0, 0.15);
+    padding: 10px;
+    background: rgba(0, 0, 0, 0.2);
     border-radius: var(--radius-sm);
+    border: 1px solid rgba(255, 215, 0, 0.1);
 }
 
 .flash-stat-value {
     font-size: 1rem;
     font-weight: 800;
-    color: var(--bg-primary);
+    color: var(--accent);
 }
 
 .flash-stat-label {
     font-size: 0.65rem;
-    color: var(--bg-primary);
+    color: var(--text-secondary);
     opacity: 0.8;
     text-transform: uppercase;
     letter-spacing: 0.5px;
