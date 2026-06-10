@@ -13,6 +13,10 @@
     {
       "src": "app.js",
       "use": "@vercel/static"
+    },
+    {
+      "src": "logo.jpg",
+      "use": "@vercel/static"
     }
   ],
   "routes": [
@@ -23,6 +27,10 @@
     {
       "src": "/app.js",
       "dest": "/app.js"
+    },
+    {
+      "src": "/logo.jpg",
+      "dest": "/logo.jpg"
     },
     {
       "src": "/(.*)",
