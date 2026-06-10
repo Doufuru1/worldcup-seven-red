@@ -548,7 +548,7 @@ const App = {
             const shortAddress = this.state.wallet.address.slice(0, 6) + '...' + this.state.wallet.address.slice(-4);
 
             if (walletBtn) {
-                walletBtn.innerHTML = `<span class="wallet-icon">💼</span><span class="wallet-text">${shortAddress}</span>`;
+                walletBtn.innerHTML = `<span class="wallet-text">${shortAddress}</span>`;
                 walletBtn.classList.add('connected');
             }
 
@@ -1052,7 +1052,9 @@ const App = {
                         </button>
                     ` : reward.claimed ? `
                         <span class="claimed-badge">已领取</span>
-                    ` : ''}
+                    ` : `
+                        <span class="locked-badge">未解锁</span>
+                    `}
                 </div>
             `;
         }).join('');

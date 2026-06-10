@@ -1836,3 +1836,12 @@ html, body {
     color: var(--success);
     font-weight: 600;
 }
+
+.locked-badge {
+    display: block;
+    text-align: center;
+    padding: 8px;
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    font-weight: 600;
+}
