@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>World Cup 2026 - Prediction Platform</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div id="app">
+        <!-- Navigation -->
+        <nav class="navbar">
+            <div class="nav-brand">
+                <span class="logo">⚽</span>
+                <span class="brand-text">WorldCup<span class="accent">2026</span></span>
+            </div>
+            <div class="nav-links">
+                <a href="#" class="nav-link active" data-page="home">Matches</a>
+                <a href="#predictions" class="nav-link" data-page="predictions">My Predictions</a>
+                <a href="#leaderboard" class="nav-link" data-page="leaderboard">Leaderboard</a>
+            </div>
+            <div class="nav-wallet">
+                <button id="walletBtn" class="wallet-btn">
+                    <span class="wallet-icon">🔌</span>
+                    <span class="wallet-text">Connect Wallet</span>
+                </button>
+            </div>
+            <button class="mobile-menu-btn" id="mobileMenuBtn">☰</button>
+        </nav>
+
+        <!-- Mobile Menu -->
+        <div class="mobile-menu" id="mobileMenu">
+            <a href="#" class="mobile-link active" data-page="home">Matches</a>
+            <a href="#predictions" class="mobile-link" data-page="predictions">My Predictions</a>
+            <a href="#leaderboard" class="mobile-link" data-page="leaderboard">Leaderboard</a>
+            <button id="mobileWalletBtn" class="wallet-btn mobile-wallet">
+                <span class="wallet-icon">🔌</span>
+                <span class="wallet-text">Connect Wallet</span>
+            </button>
+        </div>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Home Page - Matches -->
+            <section id="home" class="page active">
+                <div class="page-header">
+                    <h1>Upcoming Matches</h1>
+                    <p class="subtitle">Place your predictions on World Cup 2026 matches</p>
+                </div>
+                
+                <div class="filters">
+                    <button class="filter-btn active" data-filter="all">All Matches</button>
+                    <button class="filter-btn" data-filter="group">Group Stage</button>
+                    <button class="filter-btn" data-filter="knockout">Knockout</button>
+                    <button class="filter-btn" data-filter="live">Live Now</button>
+                </div>
+
+                <div class="matches-grid" id="matchesGrid">
+                    <!-- Matches injected by JS -->
+                </div>
+            </section>
+
+            <!-- Predictions Page -->
+            <section id="predictions" class="page">
+                <div class="page-header">
+                    <h1>My Predictions</h1>
+                    <p class="subtitle">Track your prediction history and results</p>
+                </div>
+
+                <div class="stats-cards">
+                    <div class="stat-card">
+                        <div class="stat-icon">🎯</div>
+                        <div class="stat-value" id="totalPredictions">0</div>
+                        <div class="stat-label">Total Predictions</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">✅</div>
+                        <div class="stat-value" id="correctPredictions">0</div>
+                        <div class="stat-label">Correct</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">📊</div>
+                        <div class="stat-value" id="accuracyRate">0%</div>
+                        <div class="stat-label">Accuracy</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">🏆</div>
+                        <div class="stat-value" id="totalPoints">0</div>
+                        <div class="stat-label">Points</div>
+                    </div>
+                </div>
+
+                <div class="predictions-list" id="predictionsList">
+                    <!-- Predictions injected by JS -->
+                </div>
+            </section>
+
+            <!-- Leaderboard Page -->
+            <section id="leaderboard" class="page">
+                <div class="page-header">
+                    <h1>Leaderboard</h1>
+                    <p class="subtitle">Top predictors competing for glory</p>
+                </div>
+
+                <div class="leaderboard-table-container">
+                    <table class="leaderboard-table">
+                        <thead>
+                            <tr>
+                                <th>Rank</th>
+                                <th>Predictor</th>
+                                <th>Predictions</th>
+                                <th>Correct</th>
+                                <th>Accuracy</th>
+                                <th>Points</th>
+                            </tr>
+                        </thead>
+                        <tbody id="leaderboardBody">
+                            <!-- Leaderboard rows injected by JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+        </main>
+
+        <!-- Prediction Modal -->
+        <div class="modal-overlay" id="predictionModal">
+            <div class="modal">
+                <div class="modal-header">
+                    <h2>Place Your Prediction</h2>
+                    <button class="modal-close" id="modalClose">×</button>
+                </div>
+                <div class="modal-body">
+                    <div class="match-preview" id="modalMatchPreview">
+                        <!-- Match preview injected by JS -->
+                    </div>
+                    <div class="prediction-options">
+                        <button class="prediction-option" data-result="home">
+                            <span class="option-team" id="homeTeamName"></span>
+                            <span class="option-odds" id="homeOdds"></span>
+                        </button>
+                        <button class="prediction-option" data-result="draw">
+                            <span class="option-label">Draw</span>
+                            <span class="option-odds" id="drawOdds"></span>
+                        </button>
+                        <button class="prediction-option" data-result="away">
+                            <span class="option-team" id="awayTeamName"></span>
+                            <span class="option-odds" id="awayOdds"></span>
+                        </button>
+                    </div>
+                    <div class="stake-input">
+                        <label>Stake Amount</label>
+                        <div class="input-group">
+                            <input type="number" id="stakeInput" placeholder="0.00" min="1" step="0.01">
+                            <span class="input-suffix">USDC</span>
+                        </div>
+                        <div class="balance-hint">Balance: <span id="walletBalance">0.00</span> USDC</div>
+                    </div>
+                    <div class="potential-win">
+                        <span>Potential Win:</span>
+                        <span class="win-amount" id="potentialWin">0.00 USDC</span>
+                    </div>
+                    <button class="submit-prediction-btn" id="submitPrediction" disabled>
+                        Place Prediction
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Wallet Modal -->
+        <div class="modal-overlay" id="walletModal">
+            <div class="modal wallet-modal">
+                <div class="modal-header">
+                    <h2>Connect Wallet</h2>
+                    <button class="modal-close" id="walletModalClose">×</button>
+                </div>
+                <div class="modal-body">
+                    <div class="wallet-options">
+                        <button class="wallet-option" data-wallet="metamask">
+                            <span class="wallet-option-icon">🦊</span>
+                            <span class="wallet-option-name">MetaMask</span>
+                        </button>
+                        <button class="wallet-option" data-wallet="phantom">
+                            <span class="wallet-option-icon">👻</span>
+                            <span class="wallet-option-name">Phantom</span>
+                        </button>
+                        <button class="wallet-option" data-wallet="rainbow">
+                            <span class="wallet-option-icon">🌈</span>
+                            <span class="wallet-option-name">Rainbow</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Toast Notification -->
+        <div class="toast" id="toast">
+            <span class="toast-icon" id="toastIcon">✅</span>
+            <span class="toast-message" id="toastMessage">Prediction placed!</span>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
