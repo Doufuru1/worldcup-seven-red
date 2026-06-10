@@ -63,8 +63,11 @@ html, body {
     gap: 8px;
 }
 
-.header-logo {
-    font-size: 1.5rem;
+.header-logo-img {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    object-fit: cover;
 }
 
 .header-title {
@@ -209,6 +212,14 @@ html, body {
 .flash-icon {
     font-size: 2.5rem;
     animation: bounce 2s ease-in-out infinite;
+}
+
+.flash-logo-img {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid rgba(255, 255, 255, 0.3);
 }
 
 @keyframes bounce {
