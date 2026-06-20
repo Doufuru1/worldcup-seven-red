@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>World Cup 2026 - 赛事预测</title>
+    <title>DevLend - AI资产质押平台</title>
     <link rel="icon" type="image/jpeg" href="logo.jpg">
     <link rel="stylesheet" href="styles.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -13,467 +13,80 @@
 </head>
 <body>
     <div id="app">
-        <!-- Header -->
-        <header class="app-header">
-            <div class="header-brand">
-                <img src="logo.jpg" alt="WorldCup" class="header-logo-img">
-                <span class="header-title">WorldCup<span class="accent">2026</span></span>
+        <!-- 动态内容渲染区域 -->
+    </div>
+
+    <!-- 底部导航栏 -->
+    <nav class="bottom-nav">
+        <button class="bottom-nav-item active" data-page="home">
+            <span class="bottom-nav-icon">🏠</span>
+            <span class="bottom-nav-label">首页</span>
+        </button>
+        <button class="bottom-nav-item" data-page="mining">
+            <span class="bottom-nav-icon">⛏️</span>
+            <span class="bottom-nav-label">算力挖矿</span>
+        </button>
+        <button class="bottom-nav-item" data-page="trade">
+            <span class="bottom-nav-icon">🔄</span>
+            <span class="bottom-nav-label">交易</span>
+        </button>
+        <button class="bottom-nav-item" data-page="nodes">
+            <span class="bottom-nav-icon">🌐</span>
+            <span class="bottom-nav-label">节点</span>
+        </button>
+        <button class="bottom-nav-item" data-page="profile">
+            <span class="bottom-nav-icon">👤</span>
+            <span class="bottom-nav-label">我的</span>
+        </button>
+    </nav>
+
+    <!-- 钱包连接弹窗 -->
+    <div class="modal-overlay" id="walletModal">
+        <div class="bottom-sheet">
+            <div class="bottom-sheet-handle"></div>
+            <div class="bottom-sheet-header">
+                <h3>连接钱包</h3>
+                <button class="sheet-close" id="walletModalClose">✕</button>
             </div>
-            <button id="walletBtn" class="header-wallet-btn">
-                <span class="wallet-text">连接钱包</span>
-            </button>
-        </header>
-
-        <!-- Main Content -->
-        <main class="app-content">
-            <!-- Home Tab - Matches -->
-            <section id="home" class="tab-page active">
-                <!-- Flash Card -->
-                <div class="flash-card">
-                    <div class="flash-card-content">
-                        <div class="flash-icon">
-                        <img src="logo.jpg" alt="WorldCup" class="flash-logo-img">
-                    </div>
-                        <div class="flash-text">
-                            <div class="flash-title">WorldCup</div>
-                            <div class="flash-subtitle">链上世界杯赛事预测平台</div>
-                        </div>
-                    </div>
-                    <div class="flash-slogan">赢了拿 USDT，输了挖 Token</div>
-                </div>
-
-                <!-- Rules Banner -->
-                <div class="rules-banner-compact">
-                    <div class="rules-banner-toggle" id="rulesToggle">
-                        <span>📋 下注规则</span>
-                        <span class="toggle-icon">▼</span>
-                    </div>
-                    <div class="rules-banner-content" id="rulesContent">
-                        <div class="rule-item-compact">
-                            <span class="rule-dot"></span>
-                            <span>开赛前可下注：胜 / 平 / 负</span>
-                        </div>
-                        <div class="rule-item-compact">
-                            <span class="rule-dot"></span>
-                            <span>比赛开始后锁定，不可下注</span>
-                        </div>
-                        <div class="rule-item-compact">
-                            <span class="rule-dot"></span>
-                            <span>比赛结束后开奖，赢家领取奖励</span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Filter Tabs -->
-                <div class="filter-tabs">
-                    <button class="filter-tab active" data-filter="today">今日</button>
-                    <button class="filter-tab" data-filter="upcoming">即将</button>
-                    <button class="filter-tab" data-filter="live">进行中</button>
-                    <button class="filter-tab" data-filter="finished">已结束</button>
-                </div>
-
-                <!-- Matches List -->
-                <div class="matches-list" id="matchesList">
-                    <!-- Matches injected by JS -->
-                </div>
-            </section>
-
-            <!-- Mining Pool Tab -->
-            <section id="mining" class="tab-page">
-                <div class="tab-header">
-                    <h2>💎 矿池</h2>
-                    <p class="tab-subtitle">下注挖矿，赚取平台 Token</p>
-                </div>
-
-                <!-- Mining Stats -->
-                <div class="stats-row">
-                    <div class="stat-pill">
-                        <span class="stat-pill-value accent" id="miningTotalStake">0</span>
-                        <span class="stat-pill-label">累计下注</span>
-                    </div>
-                    <div class="stat-pill">
-                        <span class="stat-pill-value accent" id="miningTotalRewards">0</span>
-                        <span class="stat-pill-label">Token奖励</span>
-                    </div>
-                    <div class="stat-pill">
-                        <span class="stat-pill-value accent" id="miningLevel">Lv1</span>
-                        <span class="stat-pill-label">当前等级</span>
-                    </div>
-                    <div class="stat-pill">
-                        <span class="stat-pill-value accent" id="miningBoost">+0%</span>
-                        <span class="stat-pill-label">等级加成</span>
-                    </div>
-                </div>
-
-                <!-- User Level Card -->
-                <div class="level-card">
-                    <div class="level-header">
-                        <div class="level-badge" id="levelBadge">Lv1</div>
-                        <div class="level-info">
-                            <div class="level-name" id="levelName">新手矿工</div>
-                            <div class="level-progress-bar">
-                                <div class="level-progress-fill" id="levelProgress" style="width: 0%"></div>
-                            </div>
-                            <div class="level-progress-text" id="levelProgressText">0 / 100 USDT</div>
-                        </div>
-                    </div>
-                    <div class="level-benefits" id="levelBenefits">
-                        <div class="benefit-item active">
-                            <span class="benefit-icon">✅</span>
-                            <span>基础挖矿奖励</span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Mining Rules -->
-                <div class="rules-banner-compact">
-                    <div class="rules-banner-toggle" id="miningRulesToggle">
-                        <span>📋 挖矿规则</span>
-                        <span class="toggle-icon">▼</span>
-                    </div>
-                    <div class="rules-banner-content" id="miningRulesContent">
-                        <div class="rule-item-compact">
-                            <span class="rule-dot"></span>
-                            <span>基础挖矿奖励 = 下注金额 × 2%</span>
-                        </div>
-                        <div class="rule-item-compact">
-                            <span class="rule-dot"></span>
-                            <span>10% 赛事结束后可领取</span>
-                        </div>
-                        <div class="rule-item-compact">
-                            <span class="rule-dot"></span>
-                            <span>90% 180天线性释放</span>
-                        </div>
-                        <div class="rule-item-compact">
-                            <span class="rule-dot"></span>
-                            <span>单笔下注 ≥ 10 USDT 才有效</span>
-                        </div>
-                        <div class="rule-item-compact">
-                            <span class="rule-dot"></span>
-                            <span>赔率 < 1.05 不享受挖矿</span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Level Table -->
-                <div class="level-table-section">
-                    <h3 class="section-title">等级权益</h3>
-                    <div class="level-table" id="levelTable">
-                        <!-- Injected by JS -->
-                    </div>
-                </div>
-
-                <!-- Staking Section -->
-                <div class="staking-section">
-                    <h3 class="section-title">质押加速释放</h3>
-                    <div class="staking-card">
-                        <div class="staking-info">
-                            <div class="staking-stat">
-                                <span class="staking-label">当前质押</span>
-                                <span class="staking-value" id="stakedAmount">0 Token</span>
-                            </div>
-                            <div class="staking-stat">
-                                <span class="staking-label">释放周期</span>
-                                <span class="staking-value accent" id="releaseDays">180 天</span>
-                            </div>
-                        </div>
-                        <div class="staking-input-wrapper">
-                            <input type="number" id="stakeTokenInput" placeholder="输入质押数量" min="0" step="1">
-                            <span class="staking-currency">Token</span>
-                        </div>
-                        <div class="staking-benefits" id="stakingBenefits">
-                            <div class="staking-benefit">
-                                <span class="benefit-level">无质押</span>
-                                <span class="benefit-days">180天</span>
-                            </div>
-                            <div class="staking-benefit">
-                                <span class="benefit-level">Lv1 (500)</span>
-                                <span class="benefit-days">150天</span>
-                            </div>
-                            <div class="staking-benefit">
-                                <span class="benefit-level">Lv2 (1,000)</span>
-                                <span class="benefit-days">120天</span>
-                            </div>
-                            <div class="staking-benefit">
-                                <span class="benefit-level">Lv3 (2,000)</span>
-                                <span class="benefit-days">90天</span>
-                            </div>
-                            <div class="staking-benefit">
-                                <span class="benefit-level">Lv4 (5,000)</span>
-                                <span class="benefit-days">60天</span>
-                            </div>
-                            <div class="staking-benefit">
-                                <span class="benefit-level">Lv5 (10,000)</span>
-                                <span class="benefit-days">30天</span>
-                            </div>
-                        </div>
-                        <button class="staking-btn" id="stakeTokensBtn">质押 Token</button>
-                    </div>
-                </div>
-
-                <!-- Mining Rewards List -->
-                <div class="mining-rewards-section">
-                    <h3 class="section-title">我的挖矿奖励</h3>
-                    <div class="mining-rewards-list" id="miningRewardsList">
-                        <!-- Injected by JS -->
-                    </div>
-                </div>
-            </section>
-
-            <!-- Predictions Tab -->
-            <section id="predictions" class="tab-page">
-                <div class="tab-header">
-                    <h2>我的预测</h2>
-                    <p class="tab-subtitle">查看记录，领取奖励</p>
-                </div>
-
-                <!-- Stats Row -->
-                <div class="stats-row">
-                    <div class="stat-pill">
-                        <span class="stat-pill-value" id="totalPredictions">0</span>
-                        <span class="stat-pill-label">总预测</span>
-                    </div>
-                    <div class="stat-pill">
-                        <span class="stat-pill-value" id="correctPredictions">0</span>
-                        <span class="stat-pill-label">正确</span>
-                    </div>
-                    <div class="stat-pill">
-                        <span class="stat-pill-value" id="accuracyRate">0%</span>
-                        <span class="stat-pill-label">准确率</span>
-                    </div>
-                    <div class="stat-pill">
-                        <span class="stat-pill-value accent" id="totalWinnings">0</span>
-                        <span class="stat-pill-label">奖励</span>
-                    </div>
-                </div>
-
-                <!-- Predictions List -->
-                <div class="predictions-list" id="predictionsList">
-                    <!-- Predictions injected by JS -->
-                </div>
-            </section>
-
-            <!-- Profile Tab -->
-            <section id="profile" class="tab-page">
-                <div class="tab-header">
-                    <h2>我的</h2>
-                    <p class="tab-subtitle">个人中心</p>
-                </div>
-
-                <!-- User Card -->
-                <div class="user-card">
-                    <div class="user-avatar">👤</div>
-                    <div class="user-info">
-                        <div class="user-name" id="userName">未登录</div>
-                        <div class="user-address" id="userAddress">连接钱包查看详情</div>
-                    </div>
-                </div>
-
-                <!-- Menu Items -->
-                <div class="menu-list">
-                    <div class="menu-item" data-page="mechanism">
-                        <span class="menu-icon">📋</span>
-                        <span class="menu-text">平台机制</span>
-                        <span class="menu-arrow">›</span>
-                    </div>
-                    <div class="menu-item" data-page="leaderboard">
-                        <span class="menu-icon">🏆</span>
-                        <span class="menu-text">排行榜</span>
-                        <span class="menu-arrow">›</span>
-                    </div>
-                    <div class="menu-item" id="menuHistory">
-                        <span class="menu-icon">📊</span>
-                        <span class="menu-text">预测历史</span>
-                        <span class="menu-arrow">›</span>
-                    </div>
-                </div>
-            </section>
-
-            <!-- Mechanism Page (Full Screen) -->
-            <section id="mechanism" class="full-page">
-                <div class="full-page-header">
-                    <button class="back-btn" data-back="profile">‹</button>
-                    <h2>平台机制</h2>
-                    <div class="header-spacer"></div>
-                </div>
-                <div class="full-page-content">
-                    <div class="mechanism-card-compact">
-                        <div class="mechanism-icon-large">🎯</div>
-                        <h3>预测用户</h3>
-                        <p>使用 USDT 参与赛事预测，选择胜/平/负，预测正确获得奖金</p>
-                    </div>
-                    <div class="mechanism-card-compact">
-                        <div class="mechanism-icon-large">🛡️</div>
-                        <h3>保险池</h3>
-                        <p>投资者注入 USDT 承接风险，赚取风险收益</p>
-                    </div>
-                    <div class="mechanism-card-compact">
-                        <div class="mechanism-icon-large">📈</div>
-                        <h3>动态赔率</h3>
-                        <p>根据下注金额实时调整，冷门选项赔率更高</p>
-                    </div>
-                    <div class="mechanism-card-compact">
-                        <div class="mechanism-icon-large">🔄</div>
-                        <h3>回购销毁</h3>
-                        <p>平台手续费回购 Token，定期销毁减少流通</p>
-                    </div>
-                    <div class="rules-section">
-                        <h3>下注规则</h3>
-                        <div class="rule-step">
-                            <div class="step-num">1</div>
-                            <div class="step-text">
-                                <strong>赛前下注</strong>
-                                <span>开赛前选择胜/平/负下注</span>
-                            </div>
-                        </div>
-                        <div class="rule-step">
-                            <div class="step-num">2</div>
-                            <div class="step-text">
-                                <strong>比赛锁定</strong>
-                                <span>开始后不可下注</span>
-                            </div>
-                        </div>
-                        <div class="rule-step">
-                            <div class="step-num">3</div>
-                            <div class="step-text">
-                                <strong>赛后开奖</strong>
-                                <span>结束后自动开奖</span>
-                            </div>
-                        </div>
-                        <div class="rule-step">
-                            <div class="step-num">4</div>
-                            <div class="step-text">
-                                <strong>领取奖励</strong>
-                                <span>赢家领取奖金</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            <!-- Leaderboard Page (Full Screen) -->
-            <section id="leaderboard" class="full-page">
-                <div class="full-page-header">
-                    <button class="back-btn" data-back="profile">‹</button>
-                    <h2>排行榜</h2>
-                    <div class="header-spacer"></div>
-                </div>
-                <div class="full-page-content">
-                    <div class="leaderboard-list" id="leaderboardList">
-                        <!-- Leaderboard items injected by JS -->
-                    </div>
-                </div>
-            </section>
-        </main>
-
-        <!-- Bottom Navigation -->
-        <nav class="bottom-nav">
-            <button class="bottom-nav-item active" data-tab="home">
-                <span class="bottom-nav-icon">⚽</span>
-                <span class="bottom-nav-label">赛事</span>
-            </button>
-            <button class="bottom-nav-item" data-tab="predictions">
-                <span class="bottom-nav-icon">🎯</span>
-                <span class="bottom-nav-label">预测</span>
-            </button>
-            <button class="bottom-nav-item" data-tab="mining">
-                <span class="bottom-nav-icon">💎</span>
-                <span class="bottom-nav-label">矿池</span>
-            </button>
-            <button class="bottom-nav-item" data-tab="profile">
-                <span class="bottom-nav-icon">👤</span>
-                <span class="bottom-nav-label">我的</span>
-            </button>
-        </nav>
-
-        <!-- Prediction Modal (Bottom Sheet) -->
-        <div class="modal-overlay" id="predictionModal">
-            <div class="bottom-sheet">
-                <div class="bottom-sheet-handle"></div>
-                <div class="bottom-sheet-header">
-                    <h3>下注预测</h3>
-                    <button class="sheet-close" id="modalClose">✕</button>
-                </div>
-                <div class="bottom-sheet-body">
-                    <div class="match-status-bar" id="matchStatusBar">
-                        <!-- Status injected by JS -->
-                    </div>
-                    <div class="match-teams-large" id="matchTeamsLarge">
-                        <!-- Teams injected by JS -->
-                    </div>
-                    <div class="odds-grid">
-                        <button class="odds-card" data-result="home">
-                            <span class="odds-team" id="homeTeamName"></span>
-                            <span class="odds-value" id="homeOdds"></span>
-                            <span class="odds-label">主胜</span>
-                        </button>
-                        <button class="odds-card" data-result="draw">
-                            <span class="odds-value" id="drawOdds"></span>
-                            <span class="odds-label">平局</span>
-                        </button>
-                        <button class="odds-card" data-result="away">
-                            <span class="odds-team" id="awayTeamName"></span>
-                            <span class="odds-value" id="awayOdds"></span>
-                            <span class="odds-label">客胜</span>
-                        </button>
-                    </div>
-                    <div class="stake-section">
-                        <label class="stake-label">下注金额</label>
-                        <div class="stake-input-wrapper">
-                            <input type="number" id="stakeInput" placeholder="0.00" min="1" step="0.01">
-                            <span class="stake-currency">USDT</span>
-                        </div>
-                        <div class="stake-balance">余额: <span id="walletBalance">0.00</span> USDT</div>
-                        <div class="quick-stakes">
-                            <button class="quick-stake-btn" data-amount="10">10</button>
-                            <button class="quick-stake-btn" data-amount="50">50</button>
-                            <button class="quick-stake-btn" data-amount="100">100</button>
-                            <button class="quick-stake-btn" data-amount="500">500</button>
-                        </div>
-                    </div>
-                    <div class="potential-win-section">
-                        <span>预计奖金</span>
-                        <span class="potential-win-value" id="potentialWin">0.00 USDT</span>
-                    </div>
-                    <button class="submit-btn" id="submitPrediction" disabled>
-                        确认下注
+            <div class="bottom-sheet-body">
+                <div class="wallet-list">
+                    <button class="wallet-card" data-wallet="metamask">
+                        <span class="wallet-card-icon">🦊</span>
+                        <span class="wallet-card-name">MetaMask</span>
+                    </button>
+                    <button class="wallet-card" data-wallet="walletconnect">
+                        <span class="wallet-card-icon">🔗</span>
+                        <span class="wallet-card-name">WalletConnect</span>
+                    </button>
+                    <button class="wallet-card" data-wallet="tronlink">
+                        <span class="wallet-card-icon">👛</span>
+                        <span class="wallet-card-name">TronLink</span>
                     </button>
                 </div>
             </div>
         </div>
+    </div>
 
-        <!-- Wallet Modal -->
-        <div class="modal-overlay" id="walletModal">
-            <div class="bottom-sheet">
-                <div class="bottom-sheet-handle"></div>
-                <div class="bottom-sheet-header">
-                    <h3>连接钱包</h3>
-                    <button class="sheet-close" id="walletModalClose">✕</button>
-                </div>
-                <div class="bottom-sheet-body">
-                    <div class="wallet-list">
-                        <button class="wallet-card" data-wallet="metamask">
-                            <span class="wallet-card-icon">🦊</span>
-                            <span class="wallet-card-name">MetaMask</span>
-                        </button>
-                        <button class="wallet-card" data-wallet="phantom">
-                            <span class="wallet-card-icon">👻</span>
-                            <span class="wallet-card-name">Phantom</span>
-                        </button>
-                        <button class="wallet-card" data-wallet="rainbow">
-                            <span class="wallet-card-icon">🌈</span>
-                            <span class="wallet-card-name">Rainbow</span>
-                        </button>
-                    </div>
-                </div>
+    <!-- 领取奖励弹窗 -->
+    <div class="modal-overlay" id="claimModal">
+        <div class="bottom-sheet">
+            <div class="bottom-sheet-handle"></div>
+            <div class="bottom-sheet-header">
+                <h3>领取奖励</h3>
+                <button class="sheet-close" id="claimModalClose">✕</button>
+            </div>
+            <div class="bottom-sheet-body" style="text-align: center;">
+                <p style="color: var(--text-secondary); margin-bottom: 8px;">可领取收益</p>
+                <div class="claim-amount" id="claimAmount">0.00 USDT</div>
+                <button class="submit-btn" id="confirmClaim">立即领取</button>
             </div>
         </div>
+    </div>
 
-        <!-- Toast -->
-        <div class="toast" id="toast">
-            <span class="toast-icon" id="toastIcon">✅</span>
-            <span class="toast-message" id="toastMessage">下注成功！</span>
-        </div>
+    <!-- Toast -->
+    <div class="toast" id="toast">
+        <span class="toast-icon" id="toastIcon">✅</span>
+        <span class="toast-message" id="toastMessage">操作成功</span>
     </div>
 
     <script src="app.js"></script>
